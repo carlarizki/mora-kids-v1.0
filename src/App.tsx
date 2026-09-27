@@ -12,6 +12,7 @@ import { CatalogSection } from './components/CatalogSection';
 import { MoraHomeSections } from './components/MoraHomeSections';
 import { MoraFooterSections } from './components/MoraFooterSections';
 import { MoraFamilyHome } from './components/MoraFamilyHome';
+import { WorksheetSection } from './components/WorksheetSection';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
 
@@ -356,6 +357,9 @@ export default function App() {
               onPlayGame={handlePlayGame}
               highScores={progress.gameHighScores}
             />
+
+            {/* Worksheet & Activity Modules (download PDF or draw in-app) */}
+            <WorksheetSection language={language} />
 
             {/* Pricing, Stories, Newsletter & Clean Footer (From morakids.lovable.app) */}
             <MoraFooterSections
