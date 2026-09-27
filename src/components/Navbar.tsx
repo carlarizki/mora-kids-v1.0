@@ -119,6 +119,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </button>
               <button
+                onClick={() => handleNavClick('worksheet')}
+                className="cursor-pointer transition-colors hover:text-primary"
+              >
+                {language === 'id' ? 'Worksheet' : 'Worksheets'}
+              </button>
+              <button
                 onClick={() => handleNavClick('for-families')}
                 className="cursor-pointer transition-colors hover:text-primary"
               >
@@ -262,7 +268,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            {['How it works', 'Features', 'For families', 'Play & Games', 'Stories', 'Pricing'].map((item) => {
+            {['How it works', 'Features', 'Worksheet', 'For families', 'Play & Games', 'Stories', 'Pricing'].map((item) => {
               const target = item === 'Play & Games' ? 'games' : item.toLowerCase().replaceAll(' ', '-');
               return (
                 <button

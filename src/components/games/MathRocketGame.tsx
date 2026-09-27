@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Rocket, Star, Volume2, ArrowLeft, RefreshCw, Trophy, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../../utils/audio';
+import { playVoiceLine } from '../../utils/voiceRecorder';
 
 interface MathRocketGameProps {
   onBack: () => void;
@@ -124,6 +125,11 @@ export const MathRocketGame: React.FC<MathRocketGameProps> = ({ onBack, onFinish
     nextQuestion();
   }, [level]);
 
+  // Play parent's recorded "start" line if one exists (Voice Studio, Level A)
+  useEffect(() => {
+    playVoiceLine('start');
+  }, []);
+
   const handleSelectAnswer = (choice: number) => {
     if (selectedAnswer !== null || !currentQ) return;
     setSelectedAnswer(choice);
@@ -131,6 +137,7 @@ export const MathRocketGame: React.FC<MathRocketGameProps> = ({ onBack, onFinish
     if (choice === currentQ.answer) {
       setIsAnswerCorrect(true);
       sound.playSuccess();
+      playVoiceLine('cheer');
       const streakBonus = streak * 5;
       setScore((prev) => prev + 15 + streakBonus);
       setStreak((prev) => prev + 1);
@@ -140,6 +147,7 @@ export const MathRocketGame: React.FC<MathRocketGameProps> = ({ onBack, onFinish
     } else {
       setIsAnswerCorrect(false);
       sound.playGentleBoing();
+      playVoiceLine('retry');
       setStreak(0);
       setTimeout(() => {
         nextQuestion();

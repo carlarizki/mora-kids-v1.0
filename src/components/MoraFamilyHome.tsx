@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { VoiceLineRecorder } from './VoiceLineRecorder';
+import { VOICE_LINES } from '../utils/voiceRecorder';
 import {
   Users,
   Calendar,
@@ -609,30 +611,30 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
           </div>
 
           {/* Record Your Voice Box */}
-          <div className="p-6 rounded-2xl bg-secondary border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Mic className="size-6 text-primary" />
+          <div className="p-6 rounded-2xl bg-secondary border border-primary/20">
+            <div className="flex items-center gap-3 mb-5">
+              <Mic className="size-6 text-primary shrink-0" />
               <div>
                 <h5 className="font-display font-bold text-base text-foreground">
                   {language === 'id' ? 'Rekam Suara Baru' : 'Record a New Voice'}
                 </h5>
                 <p className="text-xs text-ink-soft">
                   {language === 'id'
-                    ? 'Cukup rekam 3 kalimat pendek (Persetujuan keluarga dijamin aman dan privat).'
-                    : 'Record 3 short phrases. Strictly private for your family.'}
+                    ? 'Rekam 3 kalimat tetap di bawah ini. Suara disimpan di perangkat ini saja (localStorage), belum di-backup ke cloud.'
+                    : 'Record the 3 fixed lines below. Stored on this device only (localStorage), not yet backed up to the cloud.'}
                 </p>
               </div>
             </div>
-            <MoraButton
-              variant="joyful"
-              size="sm"
-              onClick={() => {
-                sound.speak('Katakan: Hebat sekali sayang! Mama bangga sama kamu.');
-                alert(language === 'id' ? 'Mikrofon aktif! Rekam sampel suara Anda...' : 'Microphone ready! Recording voice sample...');
-              }}
-            >
-              <span>{language === 'id' ? 'Mulai Rekam' : 'Start Recording'}</span>
-            </MoraButton>
+            <div className="space-y-3">
+              {VOICE_LINES.map((line) => (
+                <VoiceLineRecorder key={line.id} line={line} language={language} />
+              ))}
+            </div>
+            <p className="text-[11px] text-ink-soft mt-4 leading-relaxed">
+              {language === 'id'
+                ? 'Catatan: ini rekaman kalimat tetap, bukan voice cloning — jadi audionya persis kalimat yang direkam, belum bisa menyebut nama anak secara dinamis.'
+                : "Note: these are fixed-line recordings, not voice cloning — playback is the exact recorded audio and can't dynamically say your child's name yet."}
+            </p>
           </div>
         </div>
       )}
