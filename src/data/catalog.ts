@@ -4,16 +4,21 @@ import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, Little
 // at files that never existed. Even with a correct filename, a plain string path into
 // src/ is never bundled by Vite — only files reached through an ES `import` get hashed
 // into dist/assets and actually ship in production. That's why every photo on the
-// landing page rendered as a broken image / bare alt text. Importing the real,
-// already-generated illustrations fixes it for both dev and the production build.
+// landing page rendered as a broken image / bare alt text.
+//
+// The first fix used illustrations AI Studio had already generated for this project,
+// but their style (busy, highly detailed, saturated) clashed with Mora's own minimal
+// pastel design system. These replacements were generated to match Mora's actual
+// palette (cream / sky / mint / sun / coral) and flat, low-detail illustration style.
+import moraHeroMinimal from '../assets/images/mora-hero-minimal.jpg';
+import moraFlowerMinimal from '../assets/images/mora-flower-minimal.jpg';
+import moraMomentsMinimal from '../assets/images/mora-moments-minimal.jpg';
 import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
-import moraCreativeStudio from '../assets/images/realm_creative_studio_1790447176423.jpg';
 import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
-import moraScienceLab from '../assets/images/realm_science_lab_1790447165033.jpg';
 
-export const MORA_HERO_IMAGE = moraCreativeStudio;
-export const MORA_FLOWER_IMAGE = moraOwlMascot;
-export const MORA_MOMENTS_IMAGE = moraScienceLab;
+export const MORA_HERO_IMAGE = moraHeroMinimal;
+export const MORA_FLOWER_IMAGE = moraFlowerMinimal;
+export const MORA_MOMENTS_IMAGE = moraMomentsMinimal;
 export const MORA_MASCOT_IMAGE = moraOwlMascot;
 export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
