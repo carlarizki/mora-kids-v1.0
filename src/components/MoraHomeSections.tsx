@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Bell, Heart, Leaf, Sun, Users, Palette, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, Bell, Heart, Leaf, Sun, Users, Palette, BookOpen, Sparkles, Gamepad2, Footprints } from 'lucide-react';
 import { MoraLogo, MoraSectionHeader, MoraButton } from './ui/MoraPrimitives';
 import { MORA_FLOWER_IMAGE, MORA_MOMENTS_IMAGE } from '../data/catalog';
 import { sound } from '../utils/audio';
@@ -142,10 +142,10 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
 
           <div>
             <MoraSectionHeader eyebrow="Features">
-              Everything you need for meaningful moments.
+              Play, learn, and stay in the loop — with everyone who loves your child.
             </MoraSectionHeader>
             <p className="mt-5 max-w-xl text-ink-soft leading-relaxed">
-              From play ideas to shared memories, Mora fits real family life—at home, outside, or on the go.
+              Educational games, worksheets, and guided activities—all trackable in real time by mom, dad, even grandma.
             </p>
           </div>
         </div>
@@ -154,27 +154,27 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
         <div className="relative z-10 mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
-              icon: Sun,
-              title: 'Curated activities',
-              body: 'Age-right, play-based ideas that are easy to follow.',
+              icon: Gamepad2,
+              title: 'Educational games',
+              body: 'Age-right play that teaches.',
               color: 'bg-sun/20 text-sun-foreground',
             },
             {
-              icon: Leaf,
-              title: 'Personalized for you',
-              body: "Fresh ideas shaped around your child's age and interests.",
+              icon: BookOpen,
+              title: 'Flexible worksheets',
+              body: 'Download & print, or complete right in the app.',
               color: 'bg-mint-soft text-mint',
             },
             {
-              icon: Palette,
-              title: 'Capture & reflect',
-              body: 'Save memories, notes, and all the little milestones.',
+              icon: Footprints,
+              title: 'Guided activities',
+              body: 'Fun activities to do together, including outdoors.',
               color: 'bg-sky-soft text-primary',
             },
             {
               icon: Users,
-              title: 'Family circle',
-              body: 'Invite loved ones to join the journey together.',
+              title: 'Everyone stays in the loop',
+              body: "Mom, dad, grandma—everyone sees the child's progress in real time.",
               color: 'bg-coral-soft text-coral',
             },
           ].map(({ icon: Icon, title, body, color }, idx) => (
@@ -196,11 +196,11 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
       <section id="for-families" className="bg-card py-20 lg:py-24 border-y border-border/60">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[0.65fr_1.35fr] lg:px-8">
           <div>
-            <MoraSectionHeader eyebrow="For real life">
-              Play fits into your day.
+            <MoraSectionHeader eyebrow="Fits Real Life">
+              On screen, on paper, outdoors—every moment counts.
             </MoraSectionHeader>
             <p className="mt-5 leading-relaxed text-ink-soft">
-              Messy mornings, busy afternoons, and quiet evenings all hold room for a little wonder.
+              Sometimes it's 10 minutes of a game, sometimes a worksheet at the kitchen table, sometimes hunting for dry leaves outside—Mora follows your family's rhythm.
             </p>
             <MoraButton
               variant="joyful"
@@ -225,9 +225,9 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
               className="w-full rounded-2xl object-cover shadow-soft aspect-16/9 sm:aspect-21/9"
             />
             <div className="mt-4 grid grid-cols-3 text-center font-hand text-xl font-bold text-primary select-none">
-              <span>At home</span>
-              <span>Outside</span>
-              <span>Anywhere</span>
+              <span>On screen</span>
+              <span>On paper</span>
+              <span>Outdoors</span>
             </div>
             <Sparkles className="absolute -right-3 -top-4 size-8 text-sun pointer-events-none animate-bob" />
           </div>
