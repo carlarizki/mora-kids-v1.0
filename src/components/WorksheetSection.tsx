@@ -3,12 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Download, Pencil, Eraser, Undo2, RotateCcw, Save, X, FileText } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Download,
+  Pencil,
+  Eraser,
+  Undo2,
+  RotateCcw,
+  Save,
+  X,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
+// eslint-disable-next-line import/no-unresolved
+// Unminified build: the minified worker embeds a literal ESC control byte
+// (used to strip malformed text-stream escapes) that some hosting/preview
+// environments refuse to serve as a text asset.
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import { MoraButton, MoraSectionHeader } from './ui/MoraPrimitives';
 import { WORKSHEETS_CATALOG, WorksheetItem } from '../data/worksheets';
 import { Language } from '../types/game';
 import { sound } from '../utils/audio';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 interface WorksheetSectionProps {
   language: Language;
@@ -16,105 +37,28 @@ interface WorksheetSectionProps {
 
 type Stroke = { color: string; size: number; points: { x: number; y: number }[] };
 
-const CANVAS_W = 794; // A4 @ 96dpi portrait width
-const CANVAS_H = 1123;
 const PEN_COLORS = ['#2D2A26', '#FF7A59', '#4C8DFF', '#2FB380', '#FFC24C'];
-
-// Draws the static worksheet layout (title, activity boxes, reaction row, free-draw box)
-function paintWorksheetBackground(ctx: CanvasRenderingContext2D, sheet: WorksheetItem) {
-  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
-  // Header band
-  ctx.fillStyle = '#FF7A59';
-  roundRect(ctx, 40, 40, CANVAS_W - 80, 90, 14);
-  ctx.fill();
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 30px Nunito, sans-serif';
-  ctx.fillText(`Mora — ${sheet.title}`, 64, 90);
-  ctx.font = '16px DM Sans, sans-serif';
-  ctx.fillText(`${sheet.tagline}  |  ${sheet.ageGroup}`, 64, 118);
-
-  ctx.fillStyle = '#2D2A26';
-  ctx.font = '15px DM Sans, sans-serif';
-  ctx.fillText('Nama Anak: ______________________        Tanggal: __________', 40, 165);
-
-  let y = 190;
-  sheet.activities.forEach((activity) => {
-    ctx.strokeStyle = '#E4DFD6';
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, 40, y, CANVAS_W - 80, 92, 10);
-    ctx.stroke();
-
-    ctx.fillStyle = '#FF7A59';
-    ctx.font = 'bold 17px Nunito, sans-serif';
-    ctx.fillText(activity.title, 60, y + 30);
-
-    ctx.fillStyle = '#2D2A26';
-    ctx.font = '14px DM Sans, sans-serif';
-    wrapText(ctx, activity.description, 60, y + 52, CANVAS_W - 260, 18);
-
-    ctx.fillStyle = '#8A8377';
-    ctx.font = '13px DM Sans, sans-serif';
-    ctx.fillText('Reaksi anak:', CANVAS_W - 220, y + 32);
-    ctx.font = '22px sans-serif';
-    ctx.fillText('😍   😐   😴', CANVAS_W - 220, y + 60);
-
-    y += 108;
-  });
-
-  ctx.fillStyle = '#8A8377';
-  ctx.font = 'italic 13px DM Sans, sans-serif';
-  ctx.fillText('Coret-coret bebas di sini, Mama/Papa boleh ikut gambar juga!', 40, y + 24);
-  ctx.strokeStyle = '#E4DFD6';
-  roundRect(ctx, 40, y + 36, CANVAS_W - 80, CANVAS_H - y - 76, 10);
-  ctx.stroke();
-}
-
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-  const words = text.split(' ');
-  let line = '';
-  let cy = y;
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      ctx.fillText(line, x, cy);
-      line = word;
-      cy += lineHeight;
-    } else {
-      line = test;
-    }
-  }
-  if (line) ctx.fillText(line, x, cy);
-}
+const RENDER_SCALE = 2; // crisp enough to draw on, without rendering huge bitmaps
+const REFERENCE_WIDTH = 1600; // pen/eraser sizes are tuned for a page rendered around this width
 
 export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) => {
   const [activeSheet, setActiveSheet] = useState<WorksheetItem | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const strokesRef = useRef<Stroke[]>([]);
-  const drawingRef = useRef<Stroke | null>(null);
+  const [pageCount, setPageCount] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [penColor, setPenColor] = useState(PEN_COLORS[0]);
   const [isErasing, setIsErasing] = useState(false);
 
-  const redraw = () => {
-    const canvas = canvasRef.current;
-    const sheet = activeSheet;
-    if (!canvas || !sheet) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    paintWorksheetBackground(ctx, sheet);
-    strokesRef.current.forEach((stroke) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pdfDocRef = useRef<PDFDocumentProxy | null>(null);
+  const pageBitmapCache = useRef<Map<number, HTMLCanvasElement>>(new Map());
+  const strokesByPage = useRef<Map<number, Stroke[]>>(new Map());
+  const drawingRef = useRef<Stroke | null>(null);
+
+  const drawStrokes = (ctx: CanvasRenderingContext2D, page: number) => {
+    const strokes = strokesByPage.current.get(page) || [];
+    strokes.forEach((stroke) => {
       if (stroke.points.length < 2) return;
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.size;
@@ -127,31 +71,121 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
     });
   };
 
-  useEffect(() => {
-    if (activeSheet) {
-      strokesRef.current = [];
-      redraw();
+  const redraw = useCallback(() => {
+    const canvas = canvasRef.current;
+    const bg = pageBitmapCache.current.get(currentPage);
+    if (!canvas || !bg) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bg, 0, 0);
+    drawStrokes(ctx, currentPage);
+  }, [currentPage]);
+
+  // Render (and cache) the real PDF page onto an offscreen canvas, then show it
+  const showPage = useCallback(async (pageNum: number) => {
+    const pdf = pdfDocRef.current;
+    const canvas = canvasRef.current;
+    if (!pdf || !canvas) return;
+    setIsLoading(true);
+    try {
+      let bg = pageBitmapCache.current.get(pageNum);
+      if (!bg) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: RENDER_SCALE });
+        const off = document.createElement('canvas');
+        off.width = viewport.width;
+        off.height = viewport.height;
+        const offCtx = off.getContext('2d');
+        if (!offCtx) throw new Error('no 2d context');
+        await page.render({ canvasContext: offCtx, viewport, canvas: off }).promise;
+        pageBitmapCache.current.set(pageNum, off);
+        bg = off;
+      }
+      canvas.width = bg.width;
+      canvas.height = bg.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(bg, 0, 0);
+      drawStrokes(ctx, pageNum);
+      setLoadError(null);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('worksheet page render failed', err);
+      setLoadError(
+        language === 'id' ? 'Gagal memuat halaman worksheet.' : 'Failed to load this worksheet page.'
+      );
+    } finally {
+      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
+  // Load the PDF fresh every time a worksheet is opened
+  useEffect(() => {
+    if (!activeSheet) return;
+    let cancelled = false;
+    setIsLoading(true);
+    setLoadError(null);
+    strokesByPage.current = new Map();
+    pageBitmapCache.current = new Map();
+    pdfDocRef.current = null;
+    setCurrentPage(1);
+
+    pdfjsLib
+      .getDocument({ url: activeSheet.pdfUrl })
+      .promise.then((pdf) => {
+        if (cancelled) return;
+        pdfDocRef.current = pdf;
+        setPageCount(pdf.numPages);
+        showPage(1);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError(language === 'id' ? 'Gagal memuat worksheet.' : 'Failed to load the worksheet.');
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSheet]);
+
+  // Re-render when the visible page changes (after the doc is already loaded)
+  useEffect(() => {
+    if (activeSheet && pdfDocRef.current) {
+      showPage(currentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = CANVAS_W / rect.width;
-    const scaleY = CANVAS_H / rect.height;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
     return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  };
+
+  const penSize = () => {
+    const canvas = canvasRef.current;
+    const factor = canvas ? canvas.width / REFERENCE_WIDTH : 1;
+    return (isErasing ? 48 : 9) * factor;
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
     const stroke: Stroke = {
       color: isErasing ? '#FFFFFF' : penColor,
-      size: isErasing ? 26 : 5,
+      size: penSize(),
       points: [getPos(e)],
     };
     drawingRef.current = stroke;
-    strokesRef.current.push(stroke);
+    const list = strokesByPage.current.get(currentPage) || [];
+    list.push(stroke);
+    strokesByPage.current.set(currentPage, list);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -165,13 +199,15 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
   };
 
   const handleUndo = () => {
-    strokesRef.current.pop();
+    const list = strokesByPage.current.get(currentPage) || [];
+    list.pop();
+    strokesByPage.current.set(currentPage, list);
     redraw();
     sound.playPop();
   };
 
   const handleClear = () => {
-    strokesRef.current = [];
+    strokesByPage.current.set(currentPage, []);
     redraw();
     sound.playPop();
   };
@@ -180,10 +216,15 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
     const canvas = canvasRef.current;
     if (!canvas || !activeSheet) return;
     const link = document.createElement('a');
-    link.download = `${activeSheet.id}-coretan.png`;
+    link.download = `${activeSheet.id}-halaman-${currentPage}-coretan.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
     sound.playSuccess();
+  };
+
+  const goToPage = (delta: number) => {
+    setCurrentPage((p) => Math.min(Math.max(1, p + delta), pageCount));
+    sound.playPop();
   };
 
   return (
@@ -294,7 +335,7 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
         </div>
       </div>
 
-      {/* Annotate Modal */}
+      {/* PDF reader + annotate modal */}
       {activeSheet && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-foreground/50 backdrop-blur-xs animate-in fade-in">
           <div className="paper-card rounded-3xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-play border border-border">
@@ -349,7 +390,8 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
               <button
                 type="button"
                 onClick={handleSaveImage}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mint-soft text-mint text-xs font-bold cursor-pointer transition-colors hover:opacity-80"
+                disabled={isLoading || !!loadError}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mint-soft text-mint text-xs font-bold cursor-pointer transition-colors hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Save className="size-3.5" />
                 <span>{language === 'id' ? 'Simpan Gambar' : 'Save image'}</span>
@@ -364,18 +406,59 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
               </button>
             </div>
 
-            {/* Canvas */}
-            <div className="flex-1 overflow-auto bg-muted/60 p-4 flex justify-center">
-              <canvas
-                ref={canvasRef}
-                width={CANVAS_W}
-                height={CANVAS_H}
-                className="bg-white rounded-xl shadow-2xs touch-none w-full max-w-[560px] h-auto"
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
-              />
+            {/* Page navigation */}
+            <div className="flex items-center justify-center gap-3 py-2 border-b border-border bg-card/60">
+              <button
+                type="button"
+                onClick={() => goToPage(-1)}
+                disabled={currentPage <= 1 || isLoading}
+                className="size-7 rounded-full bg-muted text-ink-soft hover:text-foreground flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label={language === 'id' ? 'Halaman sebelumnya' : 'Previous page'}
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <span className="text-xs font-bold text-ink-soft min-w-[90px] text-center">
+                {language === 'id' ? 'Halaman' : 'Page'} {currentPage} / {pageCount}
+              </span>
+              <button
+                type="button"
+                onClick={() => goToPage(1)}
+                disabled={currentPage >= pageCount || isLoading}
+                className="size-7 rounded-full bg-muted text-ink-soft hover:text-foreground flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label={language === 'id' ? 'Halaman berikutnya' : 'Next page'}
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+
+            {/* Canvas: the real worksheet page, drawable on top */}
+            <div className="flex-1 overflow-auto bg-muted/60 p-4 flex justify-center relative">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted/60 z-10">
+                  <Loader2 className="size-8 text-primary animate-spin" />
+                </div>
+              )}
+              {loadError ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-16 text-center max-w-xs">
+                  <p className="text-sm text-ink-soft">{loadError}</p>
+                  <MoraButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => activeSheet && showPage(currentPage)}
+                  >
+                    {language === 'id' ? 'Coba lagi' : 'Try again'}
+                  </MoraButton>
+                </div>
+              ) : (
+                <canvas
+                  ref={canvasRef}
+                  className="bg-white rounded-xl shadow-2xs touch-none w-full max-w-[560px] h-auto"
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
+                />
+              )}
             </div>
           </div>
         </div>
