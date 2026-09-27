@@ -15,6 +15,9 @@ import { MoraFamilyHome } from './components/MoraFamilyHome';
 import { WorksheetSection } from './components/WorksheetSection';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
+import { LoginModal } from './components/LoginModal';
+import { PaywallScreen } from './components/PaywallScreen';
+import { isLoggedIn, logout as authLogout } from './utils/auth';
 
 // Existing 8 Games
 import { MathRocketGame } from './components/games/MathRocketGame';
@@ -53,18 +56,17 @@ import {
 import { sound } from './utils/audio';
 
 const STORAGE_KEY = 'morakids_progress_v2';
+const FREE_TRIAL_LIMIT = 3;
 
+// Real (non-dummy) starting point — this build is going out to actual
+// friends/family testers, so progress should start empty, not pre-filled.
 const INITIAL_PROGRESS: UserProgress = {
-  totalStars: 55,
-  gamesPlayed: 4,
-  dailyStreak: 3,
-  completedQuests: ['quest-1'],
-  gameHighScores: {
-    'math-rocket': 95,
-    'rainbow-melody': 60,
-    'hijaiyah-quest': 80,
-  },
-  minutesSpent: 22,
+  totalStars: 0,
+  gamesPlayed: 0,
+  dailyStreak: 0,
+  completedQuests: [],
+  gameHighScores: {},
+  minutesSpent: 0,
 };
 
 export default function App() {
@@ -74,6 +76,12 @@ export default function App() {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const [soundMuted, setSoundMuted] = useState<boolean>(sound.isMuted());
   const [isParentModalOpen, setIsParentModalOpen] = useState(false);
+
+  // Auth (UX-flow only, shared credential — see src/utils/auth.ts)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => isLoggedIn());
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [pendingGameId, setPendingGameId] = useState<string | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   // Family State
   const [childrenList, setChildrenList] = useState<ChildProfile[]>(INITIAL_CHILDREN);
@@ -121,6 +129,51 @@ export default function App() {
   const handleToggleLanguage = () => {
     sound.playPop();
     setLanguage((prev) => (prev === 'id' ? 'en' : 'id'));
+  };
+
+  // Entry point for every "play" action in the app (hero CTA, daily quest,
+  // catalog card). Gates on: 1) logged in, 2) still has free trial plays left.
+  const requestPlayGame = (gameId: string) => {
+    if (!isAuthenticated) {
+      setPendingGameId(gameId);
+      setIsLoginOpen(true);
+      return;
+    }
+    if (progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
+      setShowPaywall(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    handlePlayGame(gameId);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    setIsLoginOpen(false);
+    setCurrentMode('play');
+    const gameId = pendingGameId;
+    setPendingGameId(null);
+    if (gameId) {
+      // We're already inside the same synchronous handler that just
+      // authenticated, so check the trial limit and launch directly instead
+      // of going back through requestPlayGame — a setTimeout hop there would
+      // close over a stale `isAuthenticated` from this render and bounce
+      // straight back to the login modal.
+      if (progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
+        setShowPaywall(true);
+      } else {
+        handlePlayGame(gameId);
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    authLogout();
+    setIsAuthenticated(false);
+    setActiveGameId(null);
+    setShowPaywall(false);
+    setCurrentMode('play');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePlayGame = (gameId: string) => {
@@ -272,18 +325,26 @@ export default function App() {
         totalStars={progress.totalStars}
         soundMuted={soundMuted}
         onToggleSound={handleToggleSound}
-        onOpenParentCorner={() => setIsParentModalOpen(true)}
+        onOpenParentCorner={() => (isAuthenticated ? setIsParentModalOpen(true) : setIsLoginOpen(true))}
         onNavigateSection={handleNavigateSection}
-        onLaunchArabicGame={() => handlePlayGame('arabic-adventure')}
+        onLaunchArabicGame={() => requestPlayGame('arabic-adventure')}
         currentMode={currentMode}
         onToggleMode={(mode) => {
+          if (mode === 'family' && !isAuthenticated) {
+            setIsLoginOpen(true);
+            return;
+          }
           sound.playPop();
           setActiveGameId(null);
+          setShowPaywall(false);
           setCurrentMode(mode);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         language={language}
         onToggleLanguage={handleToggleLanguage}
+        isAuthenticated={isAuthenticated}
+        onLoginClick={() => setIsLoginOpen(true)}
+        onLogout={handleLogout}
       />
 
       <main className="flex-1">
@@ -292,8 +353,10 @@ export default function App() {
           <div className="animate-in fade-in duration-200">
             {renderActiveGame()}
           </div>
-        ) : currentMode === 'family' ? (
-          /* Mora Family Experience (Parents, Schedule, Moments, Voice Studio) */
+        ) : showPaywall ? (
+          <PaywallScreen language={language} onBack={() => setShowPaywall(false)} />
+        ) : currentMode === 'family' && isAuthenticated ? (
+          /* Mora Family Experience (Parents, Schedule, Moments, Voice Studio) — gated */
           <MoraFamilyHome
             childrenList={childrenList}
             selectedChildId={selectedChildId}
@@ -304,42 +367,27 @@ export default function App() {
             voiceProfiles={voiceProfiles}
             liveActivity={liveActivity}
             language={language}
-            onLaunchGame={handlePlayGame}
+            onLaunchGame={requestPlayGame}
             onSwitchToKidsPlay={() => {
               sound.playPop();
               setCurrentMode('play');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
-        ) : (
-          /* Mora Play Experience (Homepage matching https://morakids.lovable.app/ + Curated Games) */
+        ) : isAuthenticated ? (
+          /* Dashboard: logged-in play experience — no marketing fluff, straight to activities */
           <div className="animate-in fade-in duration-200">
-            {/* Hero Section */}
-            <HeroBanner
-              onQuickStart={() => handlePlayGame('hijaiyah-quest')}
-              onExploreHowItWorks={() => handleNavigateSection('how-it-works')}
-            />
-
-            {/* Daily Quests Bar */}
             <DailyQuestsBar
               completedQuestIds={progress.completedQuests}
               onPlayQuest={(realmId) => {
-                if (realmId === 'math') handlePlayGame('math-rocket');
-                else if (realmId === 'literacy') handlePlayGame('phonics-safari');
-                else if (realmId === 'quran') handlePlayGame('hijaiyah-quest');
-                else if (realmId === 'science') handlePlayGame('science-circuits');
+                if (realmId === 'math') requestPlayGame('math-rocket');
+                else if (realmId === 'literacy') requestPlayGame('phonics-safari');
+                else if (realmId === 'quran') requestPlayGame('hijaiyah-quest');
+                else if (realmId === 'science') requestPlayGame('science-circuits');
                 else setCurrentRealm(realmId as RealmId);
               }}
             />
 
-            {/* How It Works + Features + For Families Sections (From morakids.lovable.app) */}
-            <MoraHomeSections
-              onExploreFeatures={() => handleNavigateSection('features')}
-              onExploreGames={() => handleNavigateSection('games')}
-              onStartActivity={() => handlePlayGame('fraction-pizza')}
-            />
-
-            {/* Learning Realms Spotlight */}
             <RealmSpotlight
               selectedRealm={currentRealm}
               onSelectRealm={(r) => {
@@ -349,25 +397,57 @@ export default function App() {
               }}
             />
 
-            {/* Games & Activities Catalog */}
             <CatalogSection
               games={GAMES_CATALOG}
               selectedRealm={currentRealm}
               onSelectRealm={setCurrentRealm}
-              onPlayGame={handlePlayGame}
+              onPlayGame={requestPlayGame}
               highScores={progress.gameHighScores}
             />
 
-            {/* Worksheet & Activity Modules (download PDF or draw in-app) */}
+            <WorksheetSection language={language} />
+          </div>
+        ) : (
+          /* Public Landing (logged out) — marketing content, matches morakids.lovable.app.
+             Games are browsable here but "play" always routes through the login gate. */
+          <div className="animate-in fade-in duration-200">
+            <HeroBanner
+              onQuickStart={() => requestPlayGame('hijaiyah-quest')}
+              onExploreHowItWorks={() => handleNavigateSection('how-it-works')}
+            />
+
+            <MoraHomeSections
+              onExploreFeatures={() => handleNavigateSection('features')}
+              onExploreGames={() => handleNavigateSection('games')}
+              onStartActivity={() => requestPlayGame('fraction-pizza')}
+            />
+
+            <RealmSpotlight
+              selectedRealm={currentRealm}
+              onSelectRealm={(r) => {
+                setCurrentRealm(r);
+                const el = document.getElementById('games');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
+
+            {/* Browsable but locked — clicking a card opens the login gate, not the game */}
+            <CatalogSection
+              games={GAMES_CATALOG}
+              selectedRealm={currentRealm}
+              onSelectRealm={setCurrentRealm}
+              onPlayGame={requestPlayGame}
+              highScores={progress.gameHighScores}
+            />
+
+            {/* Worksheet stays public on purpose — it's the lead-magnet, no login needed */}
             <WorksheetSection language={language} />
 
-            {/* Pricing, Stories, Newsletter & Clean Footer (From morakids.lovable.app) */}
             <MoraFooterSections
-              onSelectPlan={(plan) => {
-                sound.speak(language === 'id' ? `Paket ${plan} dipilih!` : `Plan ${plan} selected!`);
-                setIsParentModalOpen(true);
+              onSelectPlan={() => {
+                setIsLoginOpen(true);
               }}
-              onOpenParentCorner={() => setIsParentModalOpen(true)}
+              onOpenParentCorner={() => setIsLoginOpen(true)}
               onSelectRealm={(r) => {
                 setCurrentRealm(r as any);
                 handleNavigateSection('games');
@@ -380,12 +460,25 @@ export default function App() {
       {/* Interactive Mascot widget */}
       <MascotMora />
 
-      {/* Grown-ups / Teacher Progress modal */}
-      <ParentModal
-        isOpen={isParentModalOpen}
-        onClose={() => setIsParentModalOpen(false)}
-        progress={progress}
-        onResetProgress={handleResetProgress}
+      {/* Grown-ups / Teacher Progress modal — logged-in only */}
+      {isAuthenticated && (
+        <ParentModal
+          isOpen={isParentModalOpen}
+          onClose={() => setIsParentModalOpen(false)}
+          progress={progress}
+          onResetProgress={handleResetProgress}
+        />
+      )}
+
+      {/* Login gate (UX-flow only, shared credential) */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        language={language}
+        onClose={() => {
+          setIsLoginOpen(false);
+          setPendingGameId(null);
+        }}
+        onSuccess={handleLoginSuccess}
       />
     </div>
   );

@@ -16,6 +16,9 @@ interface NavbarProps {
   onToggleMode: (mode: 'play' | 'family') => void;
   language: Language;
   onToggleLanguage: () => void;
+  isAuthenticated: boolean;
+  onLoginClick: () => void;
+  onLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -31,6 +34,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleMode,
   language,
   onToggleLanguage,
+  isAuthenticated,
+  onLoginClick,
+  onLogout,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -51,7 +57,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
           />
 
-          {/* Mode Switcher Badge (Play vs Family) */}
+          {/* Mode Switcher Badge (Play vs Family) — logged-in only */}
+          {isAuthenticated && (
           <div className="hidden sm:flex items-center p-0.5 bg-muted rounded-full border border-border text-xs font-bold">
             <button
               onClick={() => onToggleMode('play')}
@@ -76,6 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Family</span>
             </button>
           </div>
+          )}
         </div>
 
         {/* Clean Text Navigation Links */}
@@ -184,24 +192,45 @@ export const Navbar: React.FC<NavbarProps> = ({
             {soundMuted ? <VolumeX className="size-4 text-muted-foreground" /> : <Volume2 className="size-4 text-primary" />}
           </button>
 
-          {/* Star Counter */}
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sun/15 border border-sun/30 text-sun-foreground font-bold text-xs shadow-2xs select-none"
-            title="Total Mora Stars collected"
-          >
-            <Star className="size-3.5 fill-sun text-sun" />
-            <span className="font-display font-black text-sm tabular-nums">{totalStars}</span>
-          </div>
+          {/* Star Counter — only meaningful once logged in */}
+          {isAuthenticated && (
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sun/15 border border-sun/30 text-sun-foreground font-bold text-xs shadow-2xs select-none"
+              title="Total Mora Stars collected"
+            >
+              <Star className="size-3.5 fill-sun text-sun" />
+              <span className="font-display font-black text-sm tabular-nums">{totalStars}</span>
+            </div>
+          )}
 
-          <MoraButton
-            variant={currentMode === 'family' ? 'joyful' : 'ghost'}
-            size="sm"
-            onClick={() => onToggleMode(currentMode === 'family' ? 'play' : 'family')}
-          >
-            {currentMode === 'family' ? 'Mora Play 🎮' : 'Family Mode 👨‍👩‍👧'}
-          </MoraButton>
+          {isAuthenticated && (
+            <MoraButton
+              variant={currentMode === 'family' ? 'joyful' : 'ghost'}
+              size="sm"
+              onClick={() => onToggleMode(currentMode === 'family' ? 'play' : 'family')}
+            >
+              {currentMode === 'family' ? 'Mora Play 🎮' : 'Family Mode 👨‍👩‍👧'}
+            </MoraButton>
+          )}
 
-          {currentMode === 'play' && (
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="text-xs font-bold text-ink-soft hover:text-destructive px-2 py-1.5 cursor-pointer transition-colors"
+            >
+              {language === 'id' ? 'Keluar' : 'Log out'}
+            </button>
+          )}
+
+          {!isAuthenticated && (
+            <MoraButton variant="joyful" size="default" onClick={onLoginClick}>
+              <span>{language === 'id' ? 'Masuk' : 'Log in'}</span>
+              <ArrowRight className="size-4" />
+            </MoraButton>
+          )}
+
+          {isAuthenticated && currentMode === 'play' && (
             <MoraButton
               variant="joyful"
               size="default"
@@ -243,30 +272,32 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Mobile dropdown */}
         {mobileMenuOpen && (
           <div className="paper-card absolute left-5 right-5 top-20 rounded-2xl p-5 md:hidden space-y-2 shadow-play z-50 animate-in fade-in">
-            {/* Mode switch */}
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <span className="text-xs font-bold text-ink-soft">Mode:</span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => {
-                    onToggleMode('play');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`px-3 py-1 rounded-full text-xs font-bold ${currentMode === 'play' ? 'bg-primary text-white' : 'bg-muted'}`}
-                >
-                  Play
-                </button>
-                <button
-                  onClick={() => {
-                    onToggleMode('family');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`px-3 py-1 rounded-full text-xs font-bold ${currentMode === 'family' ? 'bg-primary text-white' : 'bg-muted'}`}
-                >
-                  Family
-                </button>
+            {/* Mode switch — logged-in only */}
+            {isAuthenticated && (
+              <div className="flex items-center justify-between pb-3 border-b border-border">
+                <span className="text-xs font-bold text-ink-soft">Mode:</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      onToggleMode('play');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${currentMode === 'play' ? 'bg-primary text-white' : 'bg-muted'}`}
+                  >
+                    Play
+                  </button>
+                  <button
+                    onClick={() => {
+                      onToggleMode('family');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${currentMode === 'family' ? 'bg-primary text-white' : 'bg-muted'}`}
+                  >
+                    Family
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {['How it works', 'Features', 'Worksheet', 'For families', 'Play & Games', 'Stories', 'Pricing'].map((item) => {
               const target = item === 'Play & Games' ? 'games' : item.toLowerCase().replaceAll(' ', '-');
@@ -299,22 +330,39 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <span className="text-xs bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">Baru</span>
               </button>
-              <button
-                onClick={() => {
-                  onOpenParentCorner();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full text-left px-3 py-2 text-sm font-bold text-ink-soft hover:text-foreground rounded-xl"
-              >
-                Grown-ups Dashboard
-              </button>
-              <MoraButton
-                variant="joyful"
-                className="w-full"
-                onClick={() => handleNavClick('games')}
-              >
-                Get started
-              </MoraButton>
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    onOpenParentCorner();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm font-bold text-ink-soft hover:text-foreground rounded-xl"
+                >
+                  Grown-ups Dashboard
+                </button>
+              )}
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    onLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm font-bold text-destructive hover:bg-muted rounded-xl"
+                >
+                  {language === 'id' ? 'Keluar' : 'Log out'}
+                </button>
+              ) : (
+                <MoraButton
+                  variant="joyful"
+                  className="w-full"
+                  onClick={() => {
+                    onLoginClick();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {language === 'id' ? 'Masuk' : 'Log in'}
+                </MoraButton>
+              )}
             </div>
           </div>
         )}
