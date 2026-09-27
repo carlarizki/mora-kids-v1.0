@@ -127,7 +127,7 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
           <div className="relative">
             <img
               src={MORA_FLOWER_IMAGE}
-              alt="A child sitting outdoors in a field holding a daisy"
+              alt="A child playing with a daisy outdoors"
               width={1008}
               height={864}
               loading="lazy"
@@ -218,7 +218,7 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
           <div className="relative">
             <img
               src={MORA_MOMENTS_IMAGE}
-              alt="A parent and two children exploring nature outdoors"
+              alt="Children building, exploring nature, and looking through binoculars"
               width={1536}
               height={640}
               loading="lazy"

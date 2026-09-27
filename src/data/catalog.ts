@@ -6,19 +6,20 @@ import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, Little
 // into dist/assets and actually ship in production. That's why every photo on the
 // landing page rendered as a broken image / bare alt text.
 //
-// The first fix used illustrations AI Studio had already generated for this project,
-// but their style (busy, highly detailed, saturated) clashed with Mora's own minimal
-// pastel design system. These replacements were generated to match Mora's actual
-// palette (cream / sky / mint / sun / coral) and flat, low-detail illustration style.
-import moraHeroMinimal from '../assets/images/mora-hero-minimal.jpg';
-import moraFlowerMinimal from '../assets/images/mora-flower-minimal.jpg';
-import moraMomentsMinimal from '../assets/images/mora-moments-minimal.jpg';
+// A second pass used generated flat-illustration replacements matching Mora's pastel
+// palette, but the reference build at morakids.lovable.app (the original design target)
+// uses real photography instead. These are the same photos pulled directly from that
+// reference site (matching its original file dimensions exactly), so the landing page
+// now matches the intended design 1:1 instead of approximating it.
+import moraHeroPhoto from '../assets/images/mora-hero-photo.jpg';
+import moraFlowerPhoto from '../assets/images/mora-flower-photo.jpg';
+import moraMomentsPhoto from '../assets/images/mora-moments-photo.jpg';
 import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
 import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
 
-export const MORA_HERO_IMAGE = moraHeroMinimal;
-export const MORA_FLOWER_IMAGE = moraFlowerMinimal;
-export const MORA_MOMENTS_IMAGE = moraMomentsMinimal;
+export const MORA_HERO_IMAGE = moraHeroPhoto;
+export const MORA_FLOWER_IMAGE = moraFlowerPhoto;
+export const MORA_MOMENTS_IMAGE = moraMomentsPhoto;
 export const MORA_MASCOT_IMAGE = moraOwlMascot;
 export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
