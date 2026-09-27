@@ -200,32 +200,53 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
           {language === 'id' ? 'Worksheet & Modul Aktivitas' : 'Worksheets & Activity Modules'}
         </MoraSectionHeader>
 
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-6 items-start">
           {WORKSHEETS_CATALOG.map((sheet) => (
-            <div key={sheet.id} className="paper-card rounded-3xl p-6 sm:p-8 border border-border shadow-2xs">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <div
+              key={sheet.id}
+              className="paper-card rounded-2xl p-6 sm:p-7 transition-transform hover:-translate-y-1"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="size-12 rounded-xl bg-sky-soft text-primary flex items-center justify-center">
                   <FileText className="size-5" />
                 </div>
-                <span className="text-xs font-bold text-ink-soft">{sheet.ageGroup}</span>
+                <span className="text-xs font-bold text-ink-soft bg-muted px-2.5 py-1 rounded-full whitespace-nowrap">
+                  {sheet.ageGroup}
+                </span>
               </div>
-              <h3 className="font-display text-xl font-black text-foreground">{sheet.title}</h3>
-              <p className="text-sm text-ink-soft mt-1">{sheet.tagline}</p>
 
-              <ul className="mt-4 space-y-1 text-xs text-foreground">
+              <h3 className="mt-4 font-display text-lg sm:text-xl font-black text-foreground leading-tight">
+                {sheet.title}
+              </h3>
+              <p className="mt-1 text-sm text-ink-soft">{sheet.tagline}</p>
+
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {sheet.topics.map((topic) => (
+                  <span
+                    key={topic}
+                    className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-mint-soft text-mint"
+                  >
+                    {topic}
+                  </span>
+                ))}
+              </div>
+
+              <ul className="mt-4 space-y-1.5 text-xs text-foreground">
                 {sheet.activities.slice(0, 3).map((a) => (
                   <li key={a.title} className="flex items-start gap-1.5">
                     <span className="text-primary">•</span>
-                    <span>{a.title.replace(/^\d+\.\s*/, '')}</span>
+                    <span>{a.title}</span>
                   </li>
                 ))}
                 <li className="text-ink-soft">
-                  {language === 'id' ? `+${sheet.activities.length - 3} ide lainnya` : `+${sheet.activities.length - 3} more`}
+                  {language === 'id'
+                    ? `+${sheet.activities.length - 3} aktivitas lainnya`
+                    : `+${sheet.activities.length - 3} more`}
                 </li>
               </ul>
 
-              <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
-                <a href={sheet.pdfUrl} download={sheet.pdfFileName} onClick={() => sound.playPop()}>
+              <div className="mt-5 pt-4 border-t border-border flex flex-col sm:flex-row gap-2.5">
+                <a href={sheet.pdfUrl} download={sheet.pdfFileName} onClick={() => sound.playPop()} className="w-full">
                   <MoraButton variant="secondary" size="sm" className="w-full">
                     <Download className="size-4" />
                     <span>{language === 'id' ? 'Unduh PDF' : 'Download PDF'}</span>
@@ -244,8 +265,32 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
                   <span>{language === 'id' ? 'Kerjakan di Sini' : 'Do it here'}</span>
                 </MoraButton>
               </div>
+
+              <p className="mt-3 text-[11px] text-ink-soft text-center sm:text-left">
+                {sheet.pageCount} {language === 'id' ? 'halaman · Cetak A4' : 'pages · Print A4'}
+              </p>
             </div>
           ))}
+
+          {/* Full activity list, mirrors the printed worksheet's table of contents */}
+          <div className="paper-card rounded-2xl p-6 sm:p-7">
+            <h4 className="font-display text-sm font-black uppercase tracking-wider text-ink-soft">
+              {language === 'id' ? 'Isi worksheet ini' : "What's inside"}
+            </h4>
+            <ol className="mt-4 grid gap-3 sm:grid-cols-2">
+              {WORKSHEETS_CATALOG[0].activities.map((a, idx) => (
+                <li key={a.title} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-sun/20 text-xs font-black text-sun-foreground">
+                    {idx + 1}
+                  </span>
+                  <div>
+                    <p className="text-sm font-bold text-foreground leading-tight">{a.title}</p>
+                    <p className="text-xs text-ink-soft mt-0.5">{a.category}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
 
