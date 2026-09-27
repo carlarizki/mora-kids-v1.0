@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Nunito', sans-serif;
+  --font-hand: 'Gaegu', cursive;
+
+  --color-background: oklch(98.5% 0.012 88);
+  --color-foreground: oklch(29% 0.12 266);
+  --color-card: #ffffff;
+  --color-card-foreground: oklch(29% 0.12 266);
+  --color-popover: #ffffff;
+  --color-popover-foreground: oklch(29% 0.12 266);
+  --color-primary: oklch(57% 0.22 257);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: oklch(96% 0.055 213);
+  --color-secondary-foreground: oklch(29% 0.12 266);
+  --color-muted: oklch(96.5% 0.018 252);
+  --color-muted-foreground: oklch(50% 0.07 266);
+  --color-accent: oklch(92% 0.08 166);
+  --color-accent-foreground: oklch(30% 0.09 175);
+  --color-destructive: oklch(57.7% 0.245 27.325);
+  --color-destructive-foreground: oklch(98.4% 0.003 247.858);
+  --color-border: oklch(91% 0.025 260);
+  --color-input: oklch(91% 0.025 260);
+  --color-ring: oklch(57% 0.22 257);
+
+  --color-sun: oklch(83% 0.17 83);
+  --color-sun-foreground: oklch(30% 0.1 266);
+  --color-coral: oklch(70% 0.19 25);
+  --color-coral-soft: oklch(94% 0.06 24);
+  --color-mint: oklch(68% 0.16 165);
+  --color-mint-soft: oklch(94% 0.06 166);
+  --color-sky: oklch(76% 0.13 242);
+  --color-sky-soft: oklch(94% 0.05 242);
+  --color-ink-soft: oklch(42% 0.09 265);
+}
+
+:root {
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+.paper-card {
+  background: var(--color-card);
+  box-shadow: 0 18px 60px rgba(32, 30, 60, 0.06);
+  border: 1px solid var(--color-border);
+}
+
+.shadow-play {
+  box-shadow: 0 14px 36px rgba(32, 30, 60, 0.12);
+}
+
+.shadow-soft {
+  box-shadow: 0 18px 60px rgba(32, 30, 60, 0.06);
+}
+
+.blob-soft {
+  border-radius: 55% 45% 63% 37% / 52% 59% 41% 48%;
+}
+
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+.animate-bob {
+  animation: bob 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob {
+    animation: none;
+  }
+}

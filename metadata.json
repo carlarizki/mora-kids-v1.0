@@ -1,0 +1,6 @@
+{
+  "name": "MoraKids - Educational Games & Playful Learning",
+  "description": "Discover playful educational mini-games across Math Kingdom, Science Lab, Storyverse, and Creative Studio designed for curious young minds.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
