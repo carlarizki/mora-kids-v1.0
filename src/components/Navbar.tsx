@@ -88,7 +88,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Clean Text Navigation Links */}
         <nav className="hidden items-center gap-7 text-sm font-semibold text-ink-soft md:flex" aria-label="Main navigation">
-          {currentMode === 'play' ? (
+          {!isAuthenticated ? (
+            // Logged-out marketing nav — mirrors morakids.lovable.app: 4 scroll links only.
             <>
               <button
                 onClick={() => handleNavClick('how-it-works')}
@@ -103,6 +104,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {language === 'id' ? 'Fitur' : 'Features'}
               </button>
               <button
+                onClick={() => handleNavClick('for-families')}
+                className="cursor-pointer transition-colors hover:text-primary"
+              >
+                {language === 'id' ? 'Keluarga' : 'For families'}
+              </button>
+              <button
+                onClick={() => handleNavClick('stories')}
+                className="cursor-pointer transition-colors hover:text-primary"
+              >
+                {language === 'id' ? 'Cerita' : 'Stories'}
+              </button>
+            </>
+          ) : currentMode === 'play' ? (
+            // Logged-in dashboard nav — actual product destinations, not marketing anchors.
+            <>
+              <button
                 onClick={() => handleNavClick('games')}
                 className={`cursor-pointer transition-colors ${
                   currentRealm !== 'all' ? 'text-primary font-bold' : 'hover:text-primary'
@@ -111,32 +128,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {language === 'id' ? 'Permainan' : 'Play & Games'}
               </button>
               <button
-                onClick={() => {
-                  if (onLaunchArabicGame) {
-                    onLaunchArabicGame();
-                  } else {
-                    onSelectRealm('quran');
-                    handleNavClick('games');
-                  }
-                }}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-bold transition-all shadow-2xs cursor-pointer group"
-                title="Petualangan Bahasa Arab (1001 Malam)"
-              >
-                <span>🌙</span>
-                <span>{language === 'id' ? 'Bahasa Arab' : 'Arabic Games'}</span>
-                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              </button>
-              <button
                 onClick={() => handleNavClick('worksheet')}
                 className="cursor-pointer transition-colors hover:text-primary"
               >
                 {language === 'id' ? 'Worksheet' : 'Worksheets'}
-              </button>
-              <button
-                onClick={() => handleNavClick('for-families')}
-                className="cursor-pointer transition-colors hover:text-primary"
-              >
-                {language === 'id' ? 'Keluarga' : 'For families'}
               </button>
               <button
                 onClick={() => handleNavClick('pricing')}
@@ -204,16 +199,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           {isAuthenticated && (
-            <MoraButton
-              variant={currentMode === 'family' ? 'joyful' : 'ghost'}
-              size="sm"
-              onClick={() => onToggleMode(currentMode === 'family' ? 'play' : 'family')}
-            >
-              {currentMode === 'family' ? 'Mora Play 🎮' : 'Family Mode 👨‍👩‍👧'}
-            </MoraButton>
-          )}
-
-          {isAuthenticated && (
             <button
               type="button"
               onClick={onLogout}
@@ -224,22 +209,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
 
           {!isAuthenticated && (
-            <MoraButton variant="joyful" size="default" onClick={onLoginClick}>
-              <span>{language === 'id' ? 'Masuk' : 'Log in'}</span>
-              <ArrowRight className="size-4" />
-            </MoraButton>
+            <>
+              <button
+                type="button"
+                onClick={onLoginClick}
+                className="text-xs font-bold text-ink-soft hover:text-foreground px-2 py-1.5 cursor-pointer transition-colors"
+              >
+                {language === 'id' ? 'Masuk' : 'Log in'}
+              </button>
+              <MoraButton variant="joyful" size="default" onClick={onLoginClick}>
+                <span>{language === 'id' ? 'Mulai' : 'Get started'}</span>
+                <ArrowRight className="size-4" />
+              </MoraButton>
+            </>
           )}
 
-          {isAuthenticated && currentMode === 'play' && (
-            <MoraButton
-              variant="joyful"
-              size="default"
-              onClick={() => handleNavClick('games')}
-            >
-              <span>{language === 'id' ? 'Mulai Main' : 'Get started'}</span>
-              <ArrowRight className="size-4" />
-            </MoraButton>
-          )}
         </div>
 
         {/* Mobile menu hamburger */}
@@ -299,7 +283,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {['How it works', 'Features', 'Worksheet', 'For families', 'Play & Games', 'Stories', 'Pricing'].map((item) => {
+            {(isAuthenticated
+              ? ['Play & Games', 'Worksheet', 'Pricing']
+              : ['How it works', 'Features', 'For families', 'Stories']
+            ).map((item) => {
               const target = item === 'Play & Games' ? 'games' : item.toLowerCase().replaceAll(' ', '-');
               return (
                 <button
@@ -312,24 +299,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               );
             })}
             <div className="pt-2 border-t border-border flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  if (onLaunchArabicGame) {
-                    onLaunchArabicGame();
-                  } else {
-                    onSelectRealm('quran');
-                    handleNavClick('games');
-                  }
-                }}
-                className="w-full text-left px-3 py-2.5 text-sm font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <span>🌙</span>
-                  <span>Petualangan Bahasa Arab (1001 Malam)</span>
-                </div>
-                <span className="text-xs bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">Baru</span>
-              </button>
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (onLaunchArabicGame) {
+                      onLaunchArabicGame();
+                    } else {
+                      onSelectRealm('quran');
+                      handleNavClick('games');
+                    }
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>🌙</span>
+                    <span>Petualangan Bahasa Arab (1001 Malam)</span>
+                  </div>
+                  <span className="text-xs bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">Baru</span>
+                </button>
+              )}
               {isAuthenticated && (
                 <button
                   onClick={() => {
