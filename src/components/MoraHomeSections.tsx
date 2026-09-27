@@ -127,11 +127,11 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
           <div className="relative">
             <img
               src={MORA_FLOWER_IMAGE}
-              alt="A child playing with a daisy outdoors"
+              alt="Mora's owl mascot flying through a sky of storybooks, numbers, and planets"
               width={1008}
               height={864}
               loading="lazy"
-              className="blob-soft h-[360px] sm:h-[420px] w-full object-cover shadow-soft"
+              className="blob-soft animate-float h-[360px] sm:h-[420px] w-full object-cover shadow-soft"
             />
             <p className="absolute -right-2 top-5 rotate-6 font-hand text-xl font-bold text-primary select-none drop-shadow-xs">
               Learning happens
@@ -218,7 +218,7 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
           <div className="relative">
             <img
               src={MORA_MOMENTS_IMAGE}
-              alt="Children building, exploring nature, and looking through binoculars"
+              alt="Children in a science lab looking through a telescope and mixing colorful experiments"
               width={1536}
               height={640}
               loading="lazy"
@@ -229,7 +229,7 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
               <span>Outside</span>
               <span>Anywhere</span>
             </div>
-            <Sparkles className="absolute -right-3 -top-4 size-8 text-sun pointer-events-none" />
+            <Sparkles className="absolute -right-3 -top-4 size-8 text-sun pointer-events-none animate-bob" />
           </div>
         </div>
       </section>

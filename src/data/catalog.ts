@@ -1,8 +1,21 @@
 import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile } from '../types/game';
 
-export const MORA_HERO_IMAGE = '/src/assets/images/mora-hero.jpg';
-export const MORA_FLOWER_IMAGE = '/src/assets/images/mora-flower.jpg';
-export const MORA_MOMENTS_IMAGE = '/src/assets/images/mora-moments.jpg';
+// NOTE: these used to be raw string paths ('/src/assets/images/mora-hero.jpg') pointing
+// at files that never existed. Even with a correct filename, a plain string path into
+// src/ is never bundled by Vite — only files reached through an ES `import` get hashed
+// into dist/assets and actually ship in production. That's why every photo on the
+// landing page rendered as a broken image / bare alt text. Importing the real,
+// already-generated illustrations fixes it for both dev and the production build.
+import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
+import moraCreativeStudio from '../assets/images/realm_creative_studio_1790447176423.jpg';
+import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
+import moraScienceLab from '../assets/images/realm_science_lab_1790447165033.jpg';
+
+export const MORA_HERO_IMAGE = moraCreativeStudio;
+export const MORA_FLOWER_IMAGE = moraOwlMascot;
+export const MORA_MOMENTS_IMAGE = moraScienceLab;
+export const MORA_MASCOT_IMAGE = moraOwlMascot;
+export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
 export const REALMS: Record<RealmId, RealmInfo> = {
   math: {
@@ -19,7 +32,7 @@ export const REALMS: Record<RealmId, RealmInfo> = {
       accent: 'oklch(83% 0.17 83)',
       lightBg: 'bg-sun/15',
     },
-    cardImage: MORA_FLOWER_IMAGE,
+    cardImage: MORA_MATH_KINGDOM_IMAGE,
   },
   science: {
     id: 'science',

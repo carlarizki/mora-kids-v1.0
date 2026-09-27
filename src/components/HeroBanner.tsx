@@ -82,10 +82,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onQuickStart, onExploreH
         {/* Photo Container */}
         <img
           src={MORA_HERO_IMAGE}
-          alt="A smiling child enjoying colorful finger painting"
+          alt="Kids painting, folding origami animals, and playing music together in a bright creative studio"
           width={1200}
           height={1008}
-          className="blob-soft relative z-10 h-full min-h-[430px] w-full object-cover object-center shadow-soft lg:min-h-[610px]"
+          className="blob-soft animate-float relative z-10 h-full min-h-[430px] w-full object-cover object-center shadow-soft lg:min-h-[610px]"
         />
 
         {/* Playful Handwritten Note */}
