@@ -17,7 +17,7 @@ import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
 import { LoginModal } from './components/LoginModal';
 import { PaywallScreen } from './components/PaywallScreen';
-import { isLoggedIn, logout as authLogout } from './utils/auth';
+import { isLoggedIn, isPremiumAccount, logout as authLogout } from './utils/auth';
 
 // Existing 8 Games
 import { MathRocketGame } from './components/games/MathRocketGame';
@@ -132,14 +132,15 @@ export default function App() {
   };
 
   // Entry point for every "play" action in the app (hero CTA, daily quest,
-  // catalog card). Gates on: 1) logged in, 2) still has free trial plays left.
+  // catalog card). Gates on: 1) logged in, 2) still has free trial plays left
+  // — premium accounts skip the trial-limit gate entirely.
   const requestPlayGame = (gameId: string) => {
     if (!isAuthenticated) {
       setPendingGameId(gameId);
       setIsLoginOpen(true);
       return;
     }
-    if (progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
+    if (!isPremiumAccount() && progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
       setShowPaywall(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -159,7 +160,7 @@ export default function App() {
       // of going back through requestPlayGame — a setTimeout hop there would
       // close over a stale `isAuthenticated` from this render and bounce
       // straight back to the login modal.
-      if (progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
+      if (!isPremiumAccount() && progress.gamesPlayed >= FREE_TRIAL_LIMIT) {
         setShowPaywall(true);
       } else {
         handlePlayGame(gameId);
