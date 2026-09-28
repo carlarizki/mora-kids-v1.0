@@ -1,0 +1,73 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { GameCatalogItem, RealmId, Language } from '../types/game';
+import { CatalogSection } from './CatalogSection';
+import { WorksheetSection } from './WorksheetSection';
+import { MoraSectionHeader } from './ui/MoraPrimitives';
+import { sound } from '../utils/audio';
+
+interface PlayWithMoraPageProps {
+  games: GameCatalogItem[];
+  selectedRealm: RealmId | 'all';
+  onSelectRealm: (realm: RealmId | 'all') => void;
+  onPlayGame: (gameId: string) => void;
+  highScores: Record<string, number>;
+  language: Language;
+  onBack: () => void;
+}
+
+// Dedicated "Play with Mora" page — the single place that holds every Mora
+// product (games catalog + worksheets, guided activities live inside the
+// worksheet/activity cards). Reached from any "Explore" CTA instead of
+// anchor-scrolling within the homepage/dashboard.
+export const PlayWithMoraPage: React.FC<PlayWithMoraPageProps> = ({
+  games,
+  selectedRealm,
+  onSelectRealm,
+  onPlayGame,
+  highScores,
+  language,
+  onBack,
+}) => {
+  return (
+    <div className="animate-in fade-in duration-200">
+      <div className="mx-auto max-w-7xl px-5 pt-8 lg:px-8">
+        <button
+          type="button"
+          onClick={() => {
+            sound.playPop();
+            onBack();
+          }}
+          className="inline-flex items-center gap-1.5 text-sm font-bold text-ink-soft transition-colors hover:text-primary cursor-pointer"
+        >
+          <ArrowLeft className="size-4" />
+          {language === 'id' ? 'Kembali' : 'Back'}
+        </button>
+
+        <MoraSectionHeader eyebrow={language === 'id' ? 'Semua Produk Mora' : 'All Mora products'} className="mt-4">
+          Play with Mora
+        </MoraSectionHeader>
+        <p className="mt-3 max-w-xl leading-relaxed text-ink-soft">
+          {language === 'id'
+            ? 'Games edukasi, worksheet yang bisa dikerjakan langsung, dan aktivitas panduan — semuanya ada di satu halaman.'
+            : 'Educational games, worksheets you can complete right here, and guided activities — everything in one place.'}
+        </p>
+      </div>
+
+      <CatalogSection
+        games={games}
+        selectedRealm={selectedRealm}
+        onSelectRealm={onSelectRealm}
+        onPlayGame={onPlayGame}
+        highScores={highScores}
+      />
+
+      <WorksheetSection language={language} />
+    </div>
+  );
+};

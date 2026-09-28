@@ -8,11 +8,10 @@ import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { DailyQuestsBar } from './components/DailyQuestsBar';
 import { RealmSpotlight } from './components/RealmSpotlight';
-import { CatalogSection } from './components/CatalogSection';
+import { PlayWithMoraPage } from './components/PlayWithMoraPage';
 import { MoraHomeSections } from './components/MoraHomeSections';
 import { MoraFooterSections } from './components/MoraFooterSections';
 import { MoraFamilyHome } from './components/MoraFamilyHome';
-import { WorksheetSection } from './components/WorksheetSection';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
 import { LoginModal } from './components/LoginModal';
@@ -74,6 +73,17 @@ export default function App() {
   const [language, setLanguage] = useState<Language>('id');
   const [currentRealm, setCurrentRealm] = useState<RealmId | 'all'>('all');
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
+  // Dedicated "Play with Mora" page — holds every product (games + worksheets)
+  // in one place. Reached via any "Explore"/games/worksheet CTA instead of
+  // anchor-scrolling within the homepage/dashboard.
+  const [showPlayPage, setShowPlayPage] = useState(false);
+  const [playPageNavCount, setPlayPageNavCount] = useState(0);
+  const playPageScrollTargetRef = React.useRef<string | null>(null);
+  const navigateToPlayPage = (scrollTarget: string | null = null) => {
+    playPageScrollTargetRef.current = scrollTarget;
+    setShowPlayPage(true);
+    setPlayPageNavCount((n) => n + 1);
+  };
   const [soundMuted, setSoundMuted] = useState<boolean>(sound.isMuted());
   const [isParentModalOpen, setIsParentModalOpen] = useState(false);
 
@@ -120,6 +130,26 @@ export default function App() {
       // ignore
     }
   }, [progress]);
+
+  // Every time we navigate into (or within) the Play with Mora page, either
+  // jump to the requested section (e.g. "worksheet") or land at the top.
+  // playPageNavCount is a nonce so re-clicking a nav link while already on
+  // the page still re-triggers the scroll (unlike keying off the target
+  // string, which would collide with clearing it back to null below).
+  useEffect(() => {
+    if (!showPlayPage || playPageNavCount === 0) return;
+    const target = playPageScrollTargetRef.current;
+    requestAnimationFrame(() => {
+      if (target) {
+        const el = document.getElementById(target);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }, [showPlayPage, playPageNavCount]);
 
   const handleToggleSound = () => {
     const nextMuted = !sound.toggleMute();
@@ -265,16 +295,18 @@ export default function App() {
   };
 
   const handleNavigateSection = (sectionId: string) => {
-    if (sectionId === 'games') {
+    if (sectionId === 'games' || sectionId === 'worksheet') {
+      // Both products now live together on the standalone Play with Mora page.
       setActiveGameId(null);
       setCurrentMode('play');
-      const el = document.getElementById('games');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      navigateToPlayPage(sectionId);
     } else if (sectionId === 'top') {
       setActiveGameId(null);
+      setShowPlayPage(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setActiveGameId(null);
+      setShowPlayPage(false);
       const el = document.getElementById(sectionId);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -338,6 +370,7 @@ export default function App() {
           sound.playPop();
           setActiveGameId(null);
           setShowPaywall(false);
+          setShowPlayPage(false);
           setCurrentMode(mode);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
@@ -356,6 +389,21 @@ export default function App() {
           </div>
         ) : showPaywall ? (
           <PaywallScreen language={language} onBack={() => setShowPaywall(false)} />
+        ) : showPlayPage ? (
+          /* Play with Mora — the one dedicated page holding every product:
+             games catalog + worksheets. */
+          <PlayWithMoraPage
+            games={GAMES_CATALOG}
+            selectedRealm={currentRealm}
+            onSelectRealm={setCurrentRealm}
+            onPlayGame={requestPlayGame}
+            highScores={progress.gameHighScores}
+            language={language}
+            onBack={() => {
+              setShowPlayPage(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         ) : currentMode === 'family' && isAuthenticated ? (
           /* Mora Family Experience (Parents, Schedule, Moments, Voice Studio) — gated */
           <MoraFamilyHome
@@ -385,7 +433,10 @@ export default function App() {
                 else if (realmId === 'literacy') requestPlayGame('phonics-safari');
                 else if (realmId === 'quran') requestPlayGame('hijaiyah-quest');
                 else if (realmId === 'science') requestPlayGame('science-circuits');
-                else setCurrentRealm(realmId as RealmId);
+                else {
+                  setCurrentRealm(realmId as RealmId);
+                  navigateToPlayPage();
+                }
               }}
             />
 
@@ -393,20 +444,10 @@ export default function App() {
               selectedRealm={currentRealm}
               onSelectRealm={(r) => {
                 setCurrentRealm(r);
-                const el = document.getElementById('games');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                setActiveGameId(null);
+                navigateToPlayPage();
               }}
             />
-
-            <CatalogSection
-              games={GAMES_CATALOG}
-              selectedRealm={currentRealm}
-              onSelectRealm={setCurrentRealm}
-              onPlayGame={requestPlayGame}
-              highScores={progress.gameHighScores}
-            />
-
-            <WorksheetSection language={language} />
           </div>
         ) : (
           /* Public Landing (logged out) — marketing content, matches morakids.lovable.app.
@@ -427,22 +468,10 @@ export default function App() {
               selectedRealm={currentRealm}
               onSelectRealm={(r) => {
                 setCurrentRealm(r);
-                const el = document.getElementById('games');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                setActiveGameId(null);
+                navigateToPlayPage();
               }}
             />
-
-            {/* Browsable but locked — clicking a card opens the login gate, not the game */}
-            <CatalogSection
-              games={GAMES_CATALOG}
-              selectedRealm={currentRealm}
-              onSelectRealm={setCurrentRealm}
-              onPlayGame={requestPlayGame}
-              highScores={progress.gameHighScores}
-            />
-
-            {/* Worksheet stays public on purpose — it's the lead-magnet, no login needed */}
-            <WorksheetSection language={language} />
 
             <MoraFooterSections
               onSelectPlan={() => {
