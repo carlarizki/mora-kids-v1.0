@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { GameCatalogItem, RealmId, Language } from '../types/game';
 import { CatalogSection } from './CatalogSection';
 import { WorksheetSection } from './WorksheetSection';
+import { MissionCardsSection } from './MissionCardsSection';
 import { MoraSectionHeader } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';
 
@@ -54,8 +55,8 @@ export const PlayWithMoraPage: React.FC<PlayWithMoraPageProps> = ({
         </MoraSectionHeader>
         <p className="mt-3 max-w-xl leading-relaxed text-ink-soft">
           {language === 'id'
-            ? 'Games edukasi, worksheet yang bisa dikerjakan langsung, dan aktivitas panduan — semuanya ada di satu halaman.'
-            : 'Educational games, worksheets you can complete right here, and guided activities — everything in one place.'}
+            ? 'Games edukasi, worksheet yang bisa dikerjakan langsung, dan mission cards untuk aktivitas offline — semuanya ada di satu halaman.'
+            : 'Educational games, worksheets you can complete right here, and offline mission cards — everything in one place.'}
         </p>
       </div>
 
@@ -68,6 +69,8 @@ export const PlayWithMoraPage: React.FC<PlayWithMoraPageProps> = ({
       />
 
       <WorksheetSection language={language} />
+
+      <MissionCardsSection language={language} />
     </div>
   );
 };
