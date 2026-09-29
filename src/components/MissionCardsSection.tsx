@@ -233,9 +233,9 @@ export const MissionCardsSection: React.FC<MissionCardsSectionProps> = ({
                         ? 'MISI'
                         : 'MISSION'}
                   </p>
-                  <h2 className="font-display text-xl sm:text-2xl font-black text-foreground leading-tight">
+                  <h3 className="font-display text-xl sm:text-2xl font-black text-foreground leading-tight">
                     {activeMission.title}
-                  </h2>
+                  </h3>
                 </div>
               </div>
               <button

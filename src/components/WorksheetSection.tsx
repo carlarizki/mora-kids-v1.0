@@ -315,9 +315,9 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
 
           {/* Full activity list, mirrors the printed worksheet's table of contents */}
           <div className="paper-card rounded-2xl p-6 sm:p-7">
-            <h4 className="font-display text-sm font-black uppercase tracking-wider text-ink-soft">
+            <h3 className="font-display text-sm font-black uppercase tracking-wider text-ink-soft">
               {language === 'id' ? 'Isi worksheet ini' : "What's inside"}
-            </h4>
+            </h3>
             <ol className="mt-4 grid gap-3 sm:grid-cols-2">
               {WORKSHEETS_CATALOG[0].activities.map((a, idx) => (
                 <li key={a.title} className="flex items-start gap-3">
