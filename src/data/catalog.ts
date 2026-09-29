@@ -1,8 +1,27 @@
 import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile } from '../types/game';
 
-export const MORA_HERO_IMAGE = '/src/assets/images/mora-hero.jpg';
-export const MORA_FLOWER_IMAGE = '/src/assets/images/mora-flower.jpg';
-export const MORA_MOMENTS_IMAGE = '/src/assets/images/mora-moments.jpg';
+// NOTE: these used to be raw string paths ('/src/assets/images/mora-hero.jpg') pointing
+// at files that never existed. Even with a correct filename, a plain string path into
+// src/ is never bundled by Vite — only files reached through an ES `import` get hashed
+// into dist/assets and actually ship in production. That's why every photo on the
+// landing page rendered as a broken image / bare alt text.
+//
+// A second pass used generated flat-illustration replacements matching Mora's pastel
+// palette, but the reference build at morakids.lovable.app (the original design target)
+// uses real photography instead. These are the same photos pulled directly from that
+// reference site (matching its original file dimensions exactly), so the landing page
+// now matches the intended design 1:1 instead of approximating it.
+import moraHeroPhoto from '../assets/images/mora-hero-photo.jpg';
+import moraFlowerPhoto from '../assets/images/mora-flower-photo.jpg';
+import moraMomentsPhoto from '../assets/images/mora-moments-photo.jpg';
+import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
+import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
+
+export const MORA_HERO_IMAGE = moraHeroPhoto;
+export const MORA_FLOWER_IMAGE = moraFlowerPhoto;
+export const MORA_MOMENTS_IMAGE = moraMomentsPhoto;
+export const MORA_MASCOT_IMAGE = moraOwlMascot;
+export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
 export const REALMS: Record<RealmId, RealmInfo> = {
   math: {
@@ -19,7 +38,7 @@ export const REALMS: Record<RealmId, RealmInfo> = {
       accent: 'oklch(83% 0.17 83)',
       lightBg: 'bg-sun/15',
     },
-    cardImage: MORA_FLOWER_IMAGE,
+    cardImage: MORA_MATH_KINGDOM_IMAGE,
   },
   science: {
     id: 'science',
@@ -279,6 +298,86 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     accentColor: '#059669',
     isNew: true,
     isPopular: true,
+  },
+  // 12. Math Fun Quest
+  {
+    id: 'math-fun-quest',
+    title: 'Math Fun Quest',
+    realm: 'math',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '4 level, 62 jenis soal acak, lengkap dengan cara mengerjakan.',
+    description: 'Kuis matematika seru untuk usia 6-12 tahun. Soal dibangkitkan acak setiap ronde dari Basic Math sampai Master Math, dengan nyawa, bonus streak & kecepatan, lencana, dan penjelasan cara mengerjakan di tiap soal.',
+    skills: ['Hitung Dasar', 'Pecahan & Desimal', 'Aljabar & Pola', 'Soal Cerita', 'Geometri'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#5B4FD6',
+    isNew: true,
+  },
+  // 13. Bhs Inggris
+  {
+    id: 'bhs-inggris-quest',
+    title: 'Bhs Inggris',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '43 mini-game: kosakata, listening & speaking, grammar, susun kalimat.',
+    description: 'Belajar Bahasa Inggris lewat 43 mini-game untuk usia 6-12 tahun, dari tebak warna dan cocokkan kata sampai listening, speaking, dan susun kalimat. Ada level Beginner-Advanced, timer bonus kecepatan, misi harian, lencana, dan Latihan Salahku untuk mengulang soal yang pernah salah.',
+    skills: ['Vocabulary', 'Listening & Speaking', 'Grammar', 'Sentence Practice'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#2EC4B6',
+    isNew: true,
+  },
+  // 14. Petualangan Sains Seru (IPA)
+  {
+    id: 'ipa-sains-seru',
+    title: 'Petualangan Sains Seru',
+    realm: 'science',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Jelajahi IPA lewat modul-modul seru, lengkap misi harian & lencana.',
+    description: 'Game IPA untuk anak SD berisi modul-modul sains yang bisa dijelajahi bebas, dengan level bertingkat, misi harian, lencana pencapaian, dan mode main bareng lewat kode room.',
+    skills: ['Sains Dasar', 'Observasi', 'Logika', 'Eksplorasi Alam'],
+    bannerImage: MORA_HERO_IMAGE,
+    accentColor: '#2BB3AB',
+    isNew: true,
+  },
+  // 15. Petualangan Bahasa Indonesia Ceria
+  {
+    id: 'bahasa-indonesia-ceria',
+    title: 'Bahasa Indonesia',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '20 mini-game: kosakata, lawan kata, susun kalimat, tanda baca, membaca.',
+    description: 'Belajar Bahasa Indonesia lewat 20 mini-game untuk usia 6-12 tahun, dari tebak huruf dan lawan kata sampai susun kalimat, tanda baca, kata baku, dan membaca-menyimak. Ada 3 level (Pemula-Mahir), 8 kategori fokus, misi harian, dan lencana.',
+    skills: ['Kosakata', 'Tata Bahasa', 'Membaca', 'Menyimak'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#0CA678',
+    isNew: true,
+  },
+  // 16. Petualangan IPS Ceria
+  {
+    id: 'ips-ceria',
+    title: 'IPS Ceria',
+    realm: 'logic',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Kuis topik, dunia & negara, tebak bendera, sortir, urutkan sejarah.',
+    description: 'Game IPS untuk anak SD: kuis topik, tebak profesi, tebak bendera negara, sortir kebutuhan vs keinginan, dan urutkan peristiwa sejarah. Ada 3 level (Beginner-Advanced), misi harian, papan bintang, dan mode main bareng lewat kode room.',
+    skills: ['Pengetahuan Umum', 'Dunia & Negara', 'Sejarah', 'Logika'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#6C4AB6',
+    isNew: true,
   },
 ];
 

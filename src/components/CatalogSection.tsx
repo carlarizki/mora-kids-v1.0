@@ -56,7 +56,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-border/60">
         <MoraSectionHeader
-          eyebrow="Play with Mora"
+          eyebrow="Educational Games"
           subtitle="Little games for curious minds that turn play into thoughtful learning."
         >
           Curated Mini-Games &amp; Adventures

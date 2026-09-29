@@ -76,6 +76,8 @@ export interface LittleMoment {
   timestamp: string;
   starsEarned?: number;
   category: string;
+  // Optional proof photo (resized data URL) — e.g. from a completed Mission Card.
+  photoUrl?: string;
 }
 
 export interface SchedulePlan {
