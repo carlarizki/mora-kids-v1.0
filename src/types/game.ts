@@ -78,6 +78,9 @@ export interface LittleMoment {
   category: string;
   // Optional proof photo (resized data URL) — e.g. from a completed Mission Card.
   photoUrl?: string;
+  // ISO date string used to group/sort the Portfolio timeline. `timestamp`
+  // above stays a display string (e.g. "Baru saja") — this is the real date.
+  createdAt: string;
 }
 
 export interface SchedulePlan {

@@ -254,6 +254,7 @@ export default function App() {
         timestamp: language === 'id' ? 'Baru saja' : 'Just now',
         starsEarned,
         category: game.title,
+        createdAt: new Date().toISOString(),
       };
       setMoments((prev) => [newMoment, ...prev]);
     }
@@ -312,6 +313,7 @@ export default function App() {
       starsEarned: mission.starsReward,
       category: 'Mission Card',
       photoUrl: photoDataUrl,
+      createdAt: new Date().toISOString(),
     };
     setMoments((prev) => [newMoment, ...prev]);
 

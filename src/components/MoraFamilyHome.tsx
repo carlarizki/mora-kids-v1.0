@@ -31,6 +31,21 @@ import {
 import { MoraButton } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';
 
+// Groups a Portfolio moment into a friendly time bucket based on its real
+// createdAt date (calendar-day diff from "now", not a rolling 24h window).
+const getMomentBucket = (createdAt: string, language: Language): string => {
+  const date = new Date(createdAt);
+  const now = new Date();
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / (24 * 60 * 60 * 1000));
+
+  if (diffDays <= 0) return language === 'id' ? 'Hari ini' : 'Today';
+  if (diffDays === 1) return language === 'id' ? 'Kemarin' : 'Yesterday';
+  if (diffDays <= 7) return language === 'id' ? 'Minggu ini' : 'This week';
+  if (diffDays <= 30) return language === 'id' ? 'Bulan ini' : 'This month';
+  return language === 'id' ? 'Lebih lama' : 'Earlier';
+};
+
 interface MoraFamilyHomeProps {
   childrenList: ChildProfile[];
   selectedChildId: string;
@@ -64,6 +79,7 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'Papa' | 'Mama' | 'Nenek' | 'Kakek' | 'Guardian'>('Papa');
   const [inviteSuccess, setInviteSuccess] = useState(false);
+  const [portfolioChildFilter, setPortfolioChildFilter] = useState<string>('all');
 
   // New plan form
   const [planTitle, setPlanTitle] = useState('');
@@ -169,7 +185,7 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
           [
             { id: 'overview' as const, label: language === 'id' ? 'Beranda Keluarga' : 'Family Home' },
             { id: 'schedule' as const, label: language === 'id' ? 'Little Plans (Jadwal)' : 'Little Plans' },
-            { id: 'moments' as const, label: language === 'id' ? "Today's Moments" : "Today's Moments" },
+            { id: 'moments' as const, label: language === 'id' ? 'Portofolio & Momen' : 'Portfolio & Moments' },
             { id: 'family' as const, label: language === 'id' ? 'Anggota Keluarga' : 'Family Circle' },
             { id: 'voice' as const, label: language === 'id' ? 'Personalized Voice' : 'Voice Studio' },
           ] as const
@@ -468,51 +484,130 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
         </div>
       )}
 
-      {/* MOMENTS TAB */}
-      {activeTab === 'moments' && (
-        <div className="paper-card rounded-3xl p-6 sm:p-10 border border-border">
-          <div className="mb-8">
-            <h2 className="font-display text-3xl font-black text-foreground">
-              {language === 'id' ? 'Buku Memori & Little Moments' : 'Family Memory Book & Moments'}
-            </h2>
-            <p className="text-sm text-ink-soft mt-1">
-              {language === 'id'
-                ? 'Kumpulan catatan kecil setiap kali anak menyelesaikan tantangan baru.'
-                : 'A warm memory feed of accomplishments, drawings, and milestones.'}
-            </p>
-          </div>
+      {/* PORTFOLIO / MOMENTS TAB */}
+      {activeTab === 'moments' && (() => {
+        const uniqueChildNames = Array.from(new Set(moments.map((m) => m.childName)));
+        const sortedMoments = [...moments].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        const filteredMoments =
+          portfolioChildFilter === 'all'
+            ? sortedMoments
+            : sortedMoments.filter((m) => m.childName === portfolioChildFilter);
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {moments.map((m) => (
-              <div key={m.id} className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4">
-                {m.photoUrl ? (
-                  <img
-                    src={m.photoUrl}
-                    alt={m.title}
-                    className="size-14 rounded-2xl object-cover border border-border shrink-0"
-                  />
-                ) : (
-                  <span className="text-3xl">{m.icon}</span>
-                )}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary uppercase font-hand">{m.category}</span>
-                    <span className="text-[11px] text-muted-foreground">{m.timestamp}</span>
-                  </div>
-                  <h4 className="font-display text-base font-black text-foreground mt-0.5">{m.title}</h4>
-                  <p className="text-xs text-ink-soft mt-1 leading-relaxed">{m.subtitle}</p>
-                  {m.starsEarned && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-sun-foreground">
-                      <Star className="size-3.5 fill-sun text-sun" />
-                      <span>+{m.starsEarned} Bintang tersimpan</span>
-                    </div>
-                  )}
-                </div>
+        // Group consecutive moments sharing a time bucket (Today / Yesterday /
+        // This week / ...). Sorted desc by createdAt, so buckets come out in
+        // chronological order without needing a separate sort pass.
+        const groups: { bucket: string; items: LittleMoment[] }[] = [];
+        filteredMoments.forEach((m) => {
+          const bucket = getMomentBucket(m.createdAt, language);
+          const last = groups[groups.length - 1];
+          if (last && last.bucket === bucket) {
+            last.items.push(m);
+          } else {
+            groups.push({ bucket, items: [m] });
+          }
+        });
+
+        return (
+          <div className="paper-card rounded-3xl p-6 sm:p-10 border border-border">
+            <div className="mb-6">
+              <h2 className="font-display text-3xl font-black text-foreground">
+                {language === 'id' ? 'Portofolio & Little Moments' : 'Portfolio & Little Moments'}
+              </h2>
+              <p className="text-sm text-ink-soft mt-1">
+                {language === 'id'
+                  ? 'Rekam jejak lengkap: games, worksheet, dan misi offline yang sudah anak selesaikan, tersusun per tanggal.'
+                  : 'A full timeline of games, worksheets, and offline missions your child has completed, grouped by date.'}
+              </p>
+            </div>
+
+            {uniqueChildNames.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2 mb-8">
+                <button
+                  onClick={() => {
+                    sound.playPop();
+                    setPortfolioChildFilter('all');
+                  }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-all ${
+                    portfolioChildFilter === 'all'
+                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      : 'bg-card text-ink-soft hover:bg-muted border border-border'
+                  }`}
+                >
+                  {language === 'id' ? 'Semua Anak' : 'All Children'}
+                </button>
+                {uniqueChildNames.map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      sound.playPop();
+                      setPortfolioChildFilter(name);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-all ${
+                      portfolioChildFilter === name
+                        ? 'bg-primary text-primary-foreground shadow-xs'
+                        : 'bg-card text-ink-soft hover:bg-muted border border-border'
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
               </div>
-            ))}
+            )}
+
+            {groups.length === 0 ? (
+              <div className="p-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-2xl">
+                {language === 'id' ? 'Belum ada momen untuk anak ini.' : 'No moments yet for this child.'}
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {groups.map((group) => (
+                  <div key={`${group.bucket}-${group.items[0].id}`}>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-ink-soft mb-3 font-hand">
+                      {group.bucket}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {group.items.map((m) => (
+                        <div
+                          key={m.id}
+                          className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4"
+                        >
+                          {m.photoUrl ? (
+                            <img
+                              src={m.photoUrl}
+                              alt={m.title}
+                              className="size-14 rounded-2xl object-cover border border-border shrink-0"
+                            />
+                          ) : (
+                            <span className="text-3xl">{m.icon}</span>
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-bold text-primary uppercase font-hand">
+                                {m.category}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground shrink-0">{m.childName}</span>
+                            </div>
+                            <h4 className="font-display text-base font-black text-foreground mt-0.5">{m.title}</h4>
+                            <p className="text-xs text-ink-soft mt-1 leading-relaxed">{m.subtitle}</p>
+                            {m.starsEarned && (
+                              <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-sun-foreground">
+                                <Star className="size-3.5 fill-sun text-sun" />
+                                <span>+{m.starsEarned} Bintang tersimpan</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* FAMILY CIRCLE TAB */}
       {activeTab === 'family' && (
