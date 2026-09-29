@@ -33,6 +33,8 @@ import { HijaiyahQuestGame } from './components/games/HijaiyahQuestGame';
 import { QuranExplorerGame } from './components/games/QuranExplorerGame';
 import { ArabicAdventureGame } from './components/games/ArabicAdventureGame';
 import { MathFunQuestGame } from './components/games/MathFunQuestGame';
+import { BhsInggrisGame } from './components/games/BhsInggrisGame';
+import { IpaGame } from './components/games/IpaGame';
 
 import {
   GAMES_CATALOG,
@@ -345,6 +347,14 @@ export default function App() {
       case 'math-fun-quest': {
         const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
         return <MathFunQuestGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
+      case 'bhs-inggris-quest': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return <BhsInggrisGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
+      case 'ipa-sains-seru': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return <IpaGame onBack={handleBackToCatalog} childName={activeChild.name} />;
       }
 
       default:

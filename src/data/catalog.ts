@@ -315,6 +315,38 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     accentColor: '#5B4FD6',
     isNew: true,
   },
+  // 13. Bhs Inggris
+  {
+    id: 'bhs-inggris-quest',
+    title: 'Bhs Inggris',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '43 mini-game: kosakata, listening & speaking, grammar, susun kalimat.',
+    description: 'Belajar Bahasa Inggris lewat 43 mini-game untuk usia 6-12 tahun, dari tebak warna dan cocokkan kata sampai listening, speaking, dan susun kalimat. Ada level Beginner-Advanced, timer bonus kecepatan, misi harian, lencana, dan Latihan Salahku untuk mengulang soal yang pernah salah.',
+    skills: ['Vocabulary', 'Listening & Speaking', 'Grammar', 'Sentence Practice'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#2EC4B6',
+    isNew: true,
+  },
+  // 14. Petualangan Sains Seru (IPA)
+  {
+    id: 'ipa-sains-seru',
+    title: 'Petualangan Sains Seru',
+    realm: 'science',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Jelajahi IPA lewat modul-modul seru, lengkap misi harian & lencana.',
+    description: 'Game IPA untuk anak SD berisi modul-modul sains yang bisa dijelajahi bebas, dengan level bertingkat, misi harian, lencana pencapaian, dan mode main bareng lewat kode room.',
+    skills: ['Sains Dasar', 'Observasi', 'Logika', 'Eksplorasi Alam'],
+    bannerImage: MORA_HERO_IMAGE,
+    accentColor: '#2BB3AB',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [
