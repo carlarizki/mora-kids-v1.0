@@ -299,6 +299,22 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     isNew: true,
     isPopular: true,
   },
+  // 12. Math Fun Quest
+  {
+    id: 'math-fun-quest',
+    title: 'Math Fun Quest',
+    realm: 'math',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '4 level, 62 jenis soal acak, lengkap dengan cara mengerjakan.',
+    description: 'Kuis matematika seru untuk usia 6-12 tahun. Soal dibangkitkan acak setiap ronde dari Basic Math sampai Master Math, dengan nyawa, bonus streak & kecepatan, lencana, dan penjelasan cara mengerjakan di tiap soal.',
+    skills: ['Hitung Dasar', 'Pecahan & Desimal', 'Aljabar & Pola', 'Soal Cerita', 'Geometri'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#5B4FD6',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [

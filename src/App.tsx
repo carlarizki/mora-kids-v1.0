@@ -32,6 +32,7 @@ import { PatternDetectiveGame } from './components/games/PatternDetectiveGame';
 import { HijaiyahQuestGame } from './components/games/HijaiyahQuestGame';
 import { QuranExplorerGame } from './components/games/QuranExplorerGame';
 import { ArabicAdventureGame } from './components/games/ArabicAdventureGame';
+import { MathFunQuestGame } from './components/games/MathFunQuestGame';
 
 import {
   GAMES_CATALOG,
@@ -339,6 +340,12 @@ export default function App() {
         return <QuranExplorerGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
       case 'arabic-adventure':
         return <ArabicAdventureGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
+
+      // Math Fun Quest — standalone static game, embedded as-is (see MathFunQuestGame.tsx)
+      case 'math-fun-quest': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return <MathFunQuestGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
 
       default:
         return null;
