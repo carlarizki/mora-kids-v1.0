@@ -347,6 +347,38 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     accentColor: '#2BB3AB',
     isNew: true,
   },
+  // 15. Petualangan Bahasa Indonesia Ceria
+  {
+    id: 'bahasa-indonesia-ceria',
+    title: 'Bahasa Indonesia',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '20 mini-game: kosakata, lawan kata, susun kalimat, tanda baca, membaca.',
+    description: 'Belajar Bahasa Indonesia lewat 20 mini-game untuk usia 6-12 tahun, dari tebak huruf dan lawan kata sampai susun kalimat, tanda baca, kata baku, dan membaca-menyimak. Ada 3 level (Pemula-Mahir), 8 kategori fokus, misi harian, dan lencana.',
+    skills: ['Kosakata', 'Tata Bahasa', 'Membaca', 'Menyimak'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#0CA678',
+    isNew: true,
+  },
+  // 16. Petualangan IPS Ceria
+  {
+    id: 'ips-ceria',
+    title: 'IPS Ceria',
+    realm: 'logic',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Kuis topik, dunia & negara, tebak bendera, sortir, urutkan sejarah.',
+    description: 'Game IPS untuk anak SD: kuis topik, tebak profesi, tebak bendera negara, sortir kebutuhan vs keinginan, dan urutkan peristiwa sejarah. Ada 3 level (Beginner-Advanced), misi harian, papan bintang, dan mode main bareng lewat kode room.',
+    skills: ['Pengetahuan Umum', 'Dunia & Negara', 'Sejarah', 'Logika'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#6C4AB6',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [

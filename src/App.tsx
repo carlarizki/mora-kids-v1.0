@@ -35,6 +35,8 @@ import { ArabicAdventureGame } from './components/games/ArabicAdventureGame';
 import { MathFunQuestGame } from './components/games/MathFunQuestGame';
 import { BhsInggrisGame } from './components/games/BhsInggrisGame';
 import { IpaGame } from './components/games/IpaGame';
+import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
+import { IpsGame } from './components/games/IpsGame';
 
 import {
   GAMES_CATALOG,
@@ -355,6 +357,14 @@ export default function App() {
       case 'ipa-sains-seru': {
         const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
         return <IpaGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
+      case 'bahasa-indonesia-ceria': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return <BahasaIndonesiaGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
+      case 'ips-ceria': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return <IpsGame onBack={handleBackToCatalog} childName={activeChild.name} />;
       }
 
       default:
