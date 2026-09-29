@@ -6,6 +6,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { GameCatalogItem, RealmId, Language } from '../types/game';
+import { MissionCardItem } from '../data/missionCards';
 import { CatalogSection } from './CatalogSection';
 import { WorksheetSection } from './WorksheetSection';
 import { MissionCardsSection } from './MissionCardsSection';
@@ -19,6 +20,8 @@ interface PlayWithMoraPageProps {
   onPlayGame: (gameId: string) => void;
   highScores: Record<string, number>;
   language: Language;
+  childId: string;
+  onCompleteMission: (mission: MissionCardItem, photoDataUrl: string) => void;
   onBack: () => void;
 }
 
@@ -33,6 +36,8 @@ export const PlayWithMoraPage: React.FC<PlayWithMoraPageProps> = ({
   onPlayGame,
   highScores,
   language,
+  childId,
+  onCompleteMission,
   onBack,
 }) => {
   return (
@@ -70,7 +75,7 @@ export const PlayWithMoraPage: React.FC<PlayWithMoraPageProps> = ({
 
       <WorksheetSection language={language} />
 
-      <MissionCardsSection language={language} />
+      <MissionCardsSection language={language} childId={childId} onCompleteMission={onCompleteMission} />
     </div>
   );
 };

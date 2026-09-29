@@ -46,6 +46,7 @@ import {
   INITIAL_SCHEDULE,
   INITIAL_VOICE_PROFILES,
 } from './data/catalog';
+import { MissionCardItem } from './data/missionCards';
 import {
   RealmId,
   UserProgress,
@@ -294,6 +295,31 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Mission Card completed offline, with a proof photo — awards stars and
+  // records a Little Moment, same reward path as finishing a digital game.
+  const handleCompleteMission = (mission: MissionCardItem, photoDataUrl: string) => {
+    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+
+    const newMoment: LittleMoment = {
+      id: `mission-${Date.now()}`,
+      childName: selectedChild.name,
+      icon: mission.emoji,
+      title: language === 'id' ? `Selesai misi: ${mission.title}` : `Completed mission: ${mission.title}`,
+      subtitle:
+        language === 'id' ? 'Aktivitas offline bareng Mora' : 'Offline activity with Mora',
+      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      starsEarned: mission.starsReward,
+      category: 'Mission Card',
+      photoUrl: photoDataUrl,
+    };
+    setMoments((prev) => [newMoment, ...prev]);
+
+    setProgress((prev) => ({
+      ...prev,
+      totalStars: prev.totalStars + mission.starsReward,
+    }));
+  };
+
   const handleResetProgress = () => {
     setProgress(INITIAL_PROGRESS);
     localStorage.removeItem(STORAGE_KEY);
@@ -426,6 +452,8 @@ export default function App() {
             onPlayGame={requestPlayGame}
             highScores={progress.gameHighScores}
             language={language}
+            childId={(childrenList.find((c) => c.id === selectedChildId) || childrenList[0]).id}
+            onCompleteMission={handleCompleteMission}
             onBack={() => {
               setShowPlayPage(false);
               window.scrollTo({ top: 0, behavior: 'smooth' });

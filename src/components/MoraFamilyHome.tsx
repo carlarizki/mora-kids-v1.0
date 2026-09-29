@@ -264,7 +264,15 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
                     key={moment.id}
                     className="p-4 rounded-2xl bg-muted/50 border border-border flex items-start gap-3.5"
                   >
-                    <span className="text-2xl mt-0.5">{moment.icon}</span>
+                    {moment.photoUrl ? (
+                      <img
+                        src={moment.photoUrl}
+                        alt={moment.title}
+                        className="size-11 rounded-xl object-cover border border-border shrink-0"
+                      />
+                    ) : (
+                      <span className="text-2xl mt-0.5">{moment.icon}</span>
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-display font-bold text-sm text-foreground">
@@ -477,7 +485,15 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {moments.map((m) => (
               <div key={m.id} className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4">
-                <span className="text-3xl">{m.icon}</span>
+                {m.photoUrl ? (
+                  <img
+                    src={m.photoUrl}
+                    alt={m.title}
+                    className="size-14 rounded-2xl object-cover border border-border shrink-0"
+                  />
+                ) : (
+                  <span className="text-3xl">{m.icon}</span>
+                )}
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-primary uppercase font-hand">{m.category}</span>
