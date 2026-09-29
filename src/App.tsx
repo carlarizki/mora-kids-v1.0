@@ -14,6 +14,7 @@ import { MoraFooterSections } from './components/MoraFooterSections';
 import { MoraFamilyHome } from './components/MoraFamilyHome';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
+import { RewardShopModal } from './components/RewardShopModal';
 import { LoginModal } from './components/LoginModal';
 import { PaywallScreen } from './components/PaywallScreen';
 import { isLoggedIn, isPremiumAccount, logout as authLogout } from './utils/auth';
@@ -46,6 +47,7 @@ import {
   INITIAL_MOMENTS,
   INITIAL_SCHEDULE,
   INITIAL_VOICE_PROFILES,
+  REWARD_SHOP_ITEMS,
 } from './data/catalog';
 import { MissionCardItem } from './data/missionCards';
 import {
@@ -58,8 +60,11 @@ import {
   SchedulePlan,
   VoiceProfile,
   LiveActivity,
+  CosmeticRewardItem,
+  FamilyReward,
 } from './types/game';
 import { sound } from './utils/audio';
+import { loadOwnedCosmetics, saveOwnedCosmetics, loadFamilyRewards, saveFamilyRewards } from './utils/rewardShop';
 
 const STORAGE_KEY = 'morakids_progress_v2';
 const FREE_TRIAL_LIMIT = 3;
@@ -93,6 +98,12 @@ export default function App() {
   };
   const [soundMuted, setSoundMuted] = useState<boolean>(sound.isMuted());
   const [isParentModalOpen, setIsParentModalOpen] = useState(false);
+  const [isRewardShopOpen, setIsRewardShopOpen] = useState(false);
+
+  // Reward Shop state (see mora-reward-shop-prd.md) — device-local via
+  // localStorage, spends from the existing account-level totalStars pool.
+  const [ownedCosmeticIds, setOwnedCosmeticIds] = useState<string[]>(() => loadOwnedCosmetics());
+  const [familyRewards, setFamilyRewards] = useState<FamilyReward[]>(() => loadFamilyRewards());
 
   // Auth (UX-flow only, shared credential — see src/utils/auth.ts)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => isLoggedIn());
@@ -137,6 +148,14 @@ export default function App() {
       // ignore
     }
   }, [progress]);
+
+  useEffect(() => {
+    saveOwnedCosmetics(ownedCosmeticIds);
+  }, [ownedCosmeticIds]);
+
+  useEffect(() => {
+    saveFamilyRewards(familyRewards);
+  }, [familyRewards]);
 
   // Every time we navigate into (or within) the Play with Mora page, either
   // jump to the requested section (e.g. "worksheet") or land at the top.
@@ -323,6 +342,65 @@ export default function App() {
     }));
   };
 
+  // Reward Shop — Track A: buy a cosmetic item once with stars. Owned items
+  // aren't re-purchasable and don't unlock any gameplay/content.
+  const handleRedeemCosmetic = (item: CosmeticRewardItem) => {
+    if (progress.totalStars < item.costStars || ownedCosmeticIds.includes(item.id)) return;
+    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+
+    setProgress((prev) => ({ ...prev, totalStars: prev.totalStars - item.costStars }));
+    setOwnedCosmeticIds((prev) => [...prev, item.id]);
+
+    const newMoment: LittleMoment = {
+      id: `shop-${Date.now()}`,
+      childName: selectedChild.name,
+      icon: item.icon,
+      title: language === 'id' ? `Membeli ${item.name}` : `Bought ${item.name}`,
+      subtitle: language === 'id' ? 'Item dari Toko Bintang' : 'Item from the Star Shop',
+      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      category: 'Toko Bintang',
+      createdAt: new Date().toISOString(),
+    };
+    setMoments((prev) => [newMoment, ...prev]);
+  };
+
+  // Reward Shop — Track B: redeem a parent-defined real-world reward.
+  // Repeatable (no ownership) — the reward itself happens off-app; this just
+  // deducts stars and logs it to the Portfolio timeline for the parent.
+  const handleRedeemFamilyReward = (reward: FamilyReward) => {
+    if (progress.totalStars < reward.costStars) return;
+    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+
+    setProgress((prev) => ({ ...prev, totalStars: prev.totalStars - reward.costStars }));
+
+    const newMoment: LittleMoment = {
+      id: `familyreward-${Date.now()}`,
+      childName: selectedChild.name,
+      icon: reward.icon,
+      title: language === 'id' ? `Menukar: ${reward.title}` : `Redeemed: ${reward.title}`,
+      subtitle: language === 'id' ? 'Hadiah dari orang tua' : 'A reward from the family',
+      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      category: 'Reward Keluarga',
+      createdAt: new Date().toISOString(),
+    };
+    setMoments((prev) => [newMoment, ...prev]);
+  };
+
+  const handleCreateFamilyReward = (title: string, costStars: number, icon: string) => {
+    const newReward: FamilyReward = {
+      id: `reward-${Date.now()}`,
+      title,
+      icon,
+      costStars,
+      createdAt: new Date().toISOString(),
+    };
+    setFamilyRewards((prev) => [...prev, newReward]);
+  };
+
+  const handleDeleteFamilyReward = (rewardId: string) => {
+    setFamilyRewards((prev) => prev.filter((r) => r.id !== rewardId || r.isDefault));
+  };
+
   const handleResetProgress = () => {
     setProgress(INITIAL_PROGRESS);
     localStorage.removeItem(STORAGE_KEY);
@@ -423,6 +501,7 @@ export default function App() {
         soundMuted={soundMuted}
         onToggleSound={handleToggleSound}
         onOpenParentCorner={() => (isAuthenticated ? setIsParentModalOpen(true) : setIsLoginOpen(true))}
+        onOpenRewardShop={() => setIsRewardShopOpen(true)}
         onNavigateSection={handleNavigateSection}
         onLaunchArabicGame={() => requestPlayGame('arabic-adventure')}
         currentMode={currentMode}
@@ -488,6 +567,11 @@ export default function App() {
               setCurrentMode('play');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            totalStars={progress.totalStars}
+            familyRewards={familyRewards}
+            onRedeemFamilyReward={handleRedeemFamilyReward}
+            onCreateFamilyReward={handleCreateFamilyReward}
+            onDeleteFamilyReward={handleDeleteFamilyReward}
           />
         ) : isAuthenticated ? (
           /* Dashboard: logged-in play experience — no marketing fluff, straight to activities */
@@ -563,6 +647,19 @@ export default function App() {
           onClose={() => setIsParentModalOpen(false)}
           progress={progress}
           onResetProgress={handleResetProgress}
+        />
+      )}
+
+      {/* Reward Shop (Track A: cosmetics) — logged-in only */}
+      {isAuthenticated && (
+        <RewardShopModal
+          isOpen={isRewardShopOpen}
+          onClose={() => setIsRewardShopOpen(false)}
+          items={REWARD_SHOP_ITEMS}
+          ownedIds={ownedCosmeticIds}
+          totalStars={progress.totalStars}
+          onRedeem={handleRedeemCosmetic}
+          language={language}
         />
       )}
 

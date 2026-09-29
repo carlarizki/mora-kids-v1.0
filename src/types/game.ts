@@ -50,6 +50,28 @@ export interface UserProgress {
   minutesSpent: number;
 }
 
+// Reward Shop — Phase 1 (see mora-reward-shop-prd.md).
+// Track A: cosmetic items, permanently unlocked once bought (no re-purchase).
+export interface CosmeticRewardItem {
+  id: string;
+  name: string;
+  icon: string;
+  costStars: number;
+  category: 'robot-skin' | 'sticker' | 'avatar-frame' | 'theme';
+}
+
+// Track B: parent-defined real-world rewards. Repeatable — redeeming doesn't
+// "own" it, it just logs a redemption Little Moment and deducts stars. The
+// actual reward happens off-app; Mora is only the ledger.
+export interface FamilyReward {
+  id: string;
+  title: string;
+  icon: string;
+  costStars: number;
+  isDefault?: boolean;
+  createdAt: string;
+}
+
 export interface ChildProfile {
   id: string;
   name: string;

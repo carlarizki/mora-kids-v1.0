@@ -1,4 +1,4 @@
-import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile } from '../types/game';
+import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile, CosmeticRewardItem, FamilyReward } from '../types/game';
 
 // NOTE: these used to be raw string paths ('/src/assets/images/mora-hero.jpg') pointing
 // at files that never existed. Even with a correct filename, a plain string path into
@@ -531,6 +531,30 @@ export const INITIAL_MOMENTS: LittleMoment[] = [
     category: 'Science',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
+];
+
+// Reward Shop — Track A: cosmetic-only, no gameplay/content unlocks, so it
+// carries zero margin risk. Costs staggered across the star-earning curve
+// (games reward ~10-20 stars each).
+export const REWARD_SHOP_ITEMS: CosmeticRewardItem[] = [
+  { id: 'skin-robot-sunny', name: 'Robot Kuning Cerah', icon: '🤖', costStars: 30, category: 'robot-skin' },
+  { id: 'skin-robot-space', name: 'Robot Angkasa', icon: '🛸', costStars: 60, category: 'robot-skin' },
+  { id: 'skin-robot-royal', name: 'Robot Kerajaan', icon: '👑', costStars: 120, category: 'robot-skin' },
+  { id: 'sticker-star-burst', name: 'Stiker Ledakan Bintang', icon: '✨', costStars: 20, category: 'sticker' },
+  { id: 'sticker-rainbow', name: 'Stiker Pelangi', icon: '🌈', costStars: 35, category: 'sticker' },
+  { id: 'sticker-trophy', name: 'Stiker Piala Juara', icon: '🏆', costStars: 50, category: 'sticker' },
+  { id: 'frame-flower', name: 'Bingkai Bunga', icon: '🌸', costStars: 40, category: 'avatar-frame' },
+  { id: 'frame-gold', name: 'Bingkai Emas', icon: '🎖️', costStars: 90, category: 'avatar-frame' },
+  { id: 'theme-galaxy', name: 'Tema Galaksi', icon: '🌌', costStars: 80, category: 'theme' },
+];
+
+// Track B: default reward templates every family starts with — mitigates the
+// "parent never sets one up" risk. Parents can add their own or delete these.
+export const DEFAULT_FAMILY_REWARDS: FamilyReward[] = [
+  { id: 'reward-default-1', title: 'Nonton film bareng malam ini', icon: '🎬', costStars: 50, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-2', title: 'Screen time tambahan 30 menit', icon: '⏰', costStars: 60, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-3', title: 'Pilih menu makan favorit', icon: '🍕', costStars: 80, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-4', title: 'Jalan-jalan ke taman / playground', icon: '🌳', costStars: 150, isDefault: true, createdAt: new Date().toISOString() },
 ];
 
 export const INITIAL_SCHEDULE: SchedulePlan[] = [
