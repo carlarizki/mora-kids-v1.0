@@ -18,21 +18,35 @@ export const MoraLogo: React.FC<{ className?: string; onClick?: () => void }> = 
   </button>
 );
 
-// Mora Section Header with playful eyebrow and bold heading
+// Mora Section Header with playful eyebrow and bold heading.
+// `size="lg"` (default) is the section-level treatment used throughout the
+// marketing homepage — unchanged. `size="page"` is a step down in scale,
+// reserved for a sub-page's own title (e.g. "Play with Mora"'s header)
+// so it reads as chrome/wayfinding rather than competing at the same
+// weight as the section headings nested inside that page.
 export const MoraSectionHeader: React.FC<{
   eyebrow?: string;
   children: React.ReactNode;
   subtitle?: string;
   centered?: boolean;
+  size?: 'lg' | 'page';
   className?: string;
-}> = ({ eyebrow, children, subtitle, centered = false, className = '' }) => (
+}> = ({ eyebrow, children, subtitle, centered = false, size = 'lg', className = '' }) => (
   <div className={`${centered ? 'mx-auto max-w-2xl text-center' : 'max-w-xl'} ${className}`}>
     {eyebrow && (
-      <p className="mb-3 font-hand text-base sm:text-lg font-bold uppercase tracking-wider text-primary">
+      <p
+        className={`mb-3 font-hand font-bold uppercase tracking-wider text-primary ${
+          size === 'page' ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
+        }`}
+      >
         {eyebrow}
       </p>
     )}
-    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-foreground font-display">
+    <h2
+      className={`font-black leading-tight text-foreground font-display ${
+        size === 'page' ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl lg:text-5xl'
+      }`}
+    >
       {children}
     </h2>
     {subtitle && (
