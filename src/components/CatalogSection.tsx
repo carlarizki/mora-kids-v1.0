@@ -96,6 +96,7 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
               { id: 'literacy', label: 'Storyverse' },
               { id: 'creative', label: 'Music & Art' },
               { id: 'logic', label: 'Brain Quest' },
+              { id: 'coding', label: '💻 Little Coders' },
             ] as const
           ).map((tab) => (
             <button

@@ -120,6 +120,25 @@ export const REALMS: Record<RealmId, RealmInfo> = {
     },
     cardImage: MORA_MOMENTS_IMAGE,
   },
+  // Pilot realm (2026-09-29) — see claude/mora-little-coders-pilot-prd.md in the
+  // Mora project for scope/rationale. Age 4-6 only, 1 game, 8 levels, no
+  // loops/conditionals yet (level 8 previews a "repeat" block as a taste-test).
+  coding: {
+    id: 'coding',
+    name: 'Little Coders',
+    shortName: 'Coding',
+    tagline: 'Sequence Moves & Solve Robot Mazes',
+    description: 'Drag-free, icon-only sequencing puzzles that teach step-by-step logic before a single line of code.',
+    icon: 'Code',
+    themeColor: {
+      bg: 'bg-violet',
+      border: 'border-violet/40',
+      text: 'text-violet',
+      accent: 'oklch(62% 0.19 300)',
+      lightBg: 'bg-violet-soft',
+    },
+    cardImage: MORA_FLOWER_IMAGE,
+  },
 };
 
 export const GAMES_CATALOG: GameCatalogItem[] = [
@@ -377,6 +396,22 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     skills: ['Pengetahuan Umum', 'Dunia & Negara', 'Sejarah', 'Logika'],
     bannerImage: MORA_MOMENTS_IMAGE,
     accentColor: '#6C4AB6',
+    isNew: true,
+  },
+  // 17. Little Coders — pilot (see claude/mora-little-coders-pilot-prd.md)
+  {
+    id: 'little-coders',
+    title: 'Robo Jalan-Jalan',
+    realm: 'coding',
+    ageGroup: 'ages-4-6',
+    difficulty: 'easy',
+    durationMinutes: 6,
+    starsReward: 20,
+    tagline: 'Susun perintah panah untuk menuntun robot sampai ke tujuan!',
+    description: 'Pilot pengenalan coding tanpa perlu bisa baca: susun perintah Maju, Belok Kiri, dan Belok Kanan sebagai ikon untuk memandu robot melewati 8 puzzle labirin yang makin menantang.',
+    skills: ['Sequencing', 'Spatial Reasoning', 'Problem Solving', 'Computational Thinking'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#8B5CF6',
     isNew: true,
   },
 ];

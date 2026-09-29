@@ -37,6 +37,7 @@ import { BhsInggrisGame } from './components/games/BhsInggrisGame';
 import { IpaGame } from './components/games/IpaGame';
 import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
 import { IpsGame } from './components/games/IpsGame';
+import { LittleCodersGame } from './components/games/LittleCodersGame';
 
 import {
   GAMES_CATALOG,
@@ -247,7 +248,7 @@ export default function App() {
       const newMoment: LittleMoment = {
         id: `mom-${Date.now()}`,
         childName: selectedChild.name,
-        icon: game.realm === 'quran' ? '🕌' : game.realm === 'math' ? '⭐' : game.realm === 'science' ? '⚡' : '🎨',
+        icon: game.realm === 'quran' ? '🕌' : game.realm === 'math' ? '⭐' : game.realm === 'science' ? '⚡' : game.realm === 'coding' ? '🤖' : '🎨',
         title: language === 'id' ? `Menyelesaikan ${game.title}` : `Completed ${game.title}`,
         subtitle: language === 'id' ? `Meraih skor ${score} dengan semangat tinggi!` : `Scored ${score} with great joy!`,
         timestamp: language === 'id' ? 'Baru saja' : 'Just now',
@@ -391,6 +392,14 @@ export default function App() {
       case 'ips-ceria': {
         const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
         return <IpsGame onBack={handleBackToCatalog} childName={activeChild.name} />;
+      }
+
+      // Little Coders — pilot (see claude/mora-little-coders-pilot-prd.md)
+      case 'little-coders': {
+        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+        return (
+          <LittleCodersGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} childId={activeChild.id} />
+        );
       }
 
       default:
