@@ -39,6 +39,7 @@ import { IpaGame } from './components/games/IpaGame';
 import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
 import { IpsGame } from './components/games/IpsGame';
 import { LittleCodersGame } from './components/games/LittleCodersGame';
+import { DiscoveryGame } from './components/games/DiscoveryGame';
 
 import {
   GAMES_CATALOG,
@@ -267,7 +268,7 @@ export default function App() {
       const newMoment: LittleMoment = {
         id: `mom-${Date.now()}`,
         childName: selectedChild.name,
-        icon: game.realm === 'quran' ? '🕌' : game.realm === 'math' ? '⭐' : game.realm === 'science' ? '⚡' : game.realm === 'coding' ? '🤖' : '🎨',
+        icon: game.realm === 'quran' ? '🕌' : game.realm === 'math' ? '⭐' : game.realm === 'science' ? '⚡' : game.realm === 'coding' ? '🤖' : game.realm === 'discovery' ? '🧭' : '🎨',
         title: language === 'id' ? `Menyelesaikan ${game.title}` : `Completed ${game.title}`,
         subtitle: language === 'id' ? `Meraih skor ${score} dengan semangat tinggi!` : `Scored ${score} with great joy!`,
         timestamp: language === 'id' ? 'Baru saja' : 'Just now',
@@ -481,6 +482,8 @@ export default function App() {
           <LittleCodersGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} childId={activeChild.id} />
         );
       }
+      case 'discovery-explorer':
+        return <DiscoveryGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
 
       default:
         return null;

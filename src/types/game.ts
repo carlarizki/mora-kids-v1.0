@@ -1,4 +1,4 @@
-export type RealmId = 'math' | 'science' | 'literacy' | 'creative' | 'logic' | 'quran' | 'coding';
+export type RealmId = 'math' | 'science' | 'literacy' | 'creative' | 'logic' | 'quran' | 'coding' | 'discovery';
 
 export type AgeGroupId = 'all' | 'ages-4-6' | 'ages-7-9' | 'ages-10-12';
 

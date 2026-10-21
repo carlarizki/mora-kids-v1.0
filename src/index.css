@@ -35,6 +35,8 @@
   --color-sky-soft: oklch(94% 0.05 242);
   --color-violet: oklch(62% 0.19 300);
   --color-violet-soft: oklch(94% 0.05 300);
+  --color-rose: oklch(68% 0.19 350);
+  --color-rose-soft: oklch(94% 0.05 350);
   --color-ink-soft: oklch(42% 0.09 265);
 }
 

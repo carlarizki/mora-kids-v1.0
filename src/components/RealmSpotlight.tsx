@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calculator, FlaskConical, BookOpen, Palette, Sparkles, Moon, Code, ChevronRight } from 'lucide-react';
+import { Calculator, FlaskConical, BookOpen, Palette, Sparkles, Moon, Code, Compass, ChevronRight } from 'lucide-react';
 import { REALMS } from '../data/catalog';
 import { RealmId } from '../types/game';
 import { MoraSectionHeader } from './ui/MoraPrimitives';
@@ -27,6 +27,8 @@ export const RealmSpotlight: React.FC<RealmSpotlightProps> = ({ onSelectRealm, s
         return <Moon className="size-5" />;
       case 'Code':
         return <Code className="size-5" />;
+      case 'Compass':
+        return <Compass className="size-5" />;
       default:
         return <Sparkles className="size-5" />;
     }

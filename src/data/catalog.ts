@@ -139,6 +139,24 @@ export const REALMS: Record<RealmId, RealmInfo> = {
     },
     cardImage: MORA_FLOWER_IMAGE,
   },
+  // Discovery engine (2026-10-21) — data-driven tap + drag-to-match activities.
+  // New topics (flags, dinosaurs, body...) are data in discoveryTopics.ts, not new games.
+  discovery: {
+    id: 'discovery',
+    name: 'Jelajah Dunia',
+    shortName: 'Jelajah',
+    tagline: 'Ketuk, Seret & Kenali Dunia',
+    description: 'Kenalan dengan bendera, dinosaurus, dan tubuhmu lewat ketukan dan seret-cocokkan yang seru.',
+    icon: 'Compass',
+    themeColor: {
+      bg: 'bg-rose',
+      border: 'border-rose/40',
+      text: 'text-rose',
+      accent: 'oklch(68% 0.19 350)',
+      lightBg: 'bg-rose-soft',
+    },
+    cardImage: MORA_FLOWER_IMAGE,
+  },
 };
 
 export const GAMES_CATALOG: GameCatalogItem[] = [
@@ -412,6 +430,22 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     skills: ['Sequencing', 'Spatial Reasoning', 'Problem Solving', 'Computational Thinking'],
     bannerImage: MORA_FLOWER_IMAGE,
     accentColor: '#8B5CF6',
+    isNew: true,
+  },
+  // 18. Jelajah Dunia — discovery engine (tap to discover + drag to match)
+  {
+    id: 'discovery-explorer',
+    title: 'Jelajah Dunia',
+    realm: 'discovery',
+    ageGroup: 'ages-4-6',
+    difficulty: 'easy',
+    durationMinutes: 6,
+    starsReward: 20,
+    tagline: 'Ketuk untuk kenalan, seret gambar ke nama yang cocok!',
+    description: 'Kenalan dengan bendera dunia, dinosaurus, dan bagian tubuhmu. Ketuk gambar untuk mendengar namanya, lalu seret ke nama yang cocok.',
+    skills: ['Pengenalan Kosakata', 'Mencocokkan', 'Pengetahuan Umum', 'Koordinasi Tangan-Mata'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#E8528F',
     isNew: true,
   },
 ];
