@@ -10,6 +10,7 @@ interface NavbarProps {
   soundMuted: boolean;
   onToggleSound: () => void;
   onOpenParentCorner: () => void;
+  onOpenRewardShop: () => void;
   onNavigateSection: (sectionId: string) => void;
   onLaunchArabicGame?: () => void;
   currentMode: 'play' | 'family';
@@ -28,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   soundMuted,
   onToggleSound,
   onOpenParentCorner,
+  onOpenRewardShop,
   onNavigateSection,
   onLaunchArabicGame,
   currentMode,
@@ -187,15 +189,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             {soundMuted ? <VolumeX className="size-4 text-muted-foreground" /> : <Volume2 className="size-4 text-primary" />}
           </button>
 
-          {/* Star Counter — only meaningful once logged in */}
+          {/* Star Counter — only meaningful once logged in; opens the Reward Shop */}
           {isAuthenticated && (
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sun/15 border border-sun/30 text-sun-foreground font-bold text-xs shadow-2xs select-none"
-              title="Total Mora Stars collected"
+            <button
+              type="button"
+              onClick={onOpenRewardShop}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sun/15 border border-sun/30 text-sun-foreground font-bold text-xs shadow-2xs select-none cursor-pointer hover:bg-sun/25 transition-colors"
+              title={language === 'id' ? 'Buka Toko Bintang' : 'Open the Star Shop'}
             >
               <Star className="size-3.5 fill-sun text-sun" />
               <span className="font-display font-black text-sm tabular-nums">{totalStars}</span>
-            </div>
+            </button>
           )}
 
           {isAuthenticated && (
@@ -317,6 +321,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Petualangan Bahasa Arab (1001 Malam)</span>
                   </div>
                   <span className="text-xs bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">Baru</span>
+                </button>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    onOpenRewardShop();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm font-bold text-sun-foreground hover:text-foreground rounded-xl flex items-center justify-between"
+                >
+                  <span>{language === 'id' ? 'Toko Bintang' : 'Star Shop'}</span>
+                  <span className="flex items-center gap-1 text-xs font-black">
+                    <Star className="size-3.5 fill-sun text-sun" />
+                    {totalStars}
+                  </span>
                 </button>
               )}
               {isAuthenticated && (

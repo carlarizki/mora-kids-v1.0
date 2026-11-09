@@ -18,30 +18,49 @@ export const MoraLogo: React.FC<{ className?: string; onClick?: () => void }> = 
   </button>
 );
 
-// Mora Section Header with playful eyebrow and bold heading
+// Mora Section Header with playful eyebrow and bold heading.
+// `size="lg"` (default) is the section-level treatment used throughout the
+// marketing homepage — unchanged, renders <h2> (the page's own <h1> lives
+// in that page's hero/banner component, e.g. HeroBanner or MoraFamilyHome's
+// "Halo, Keluarga X!"). `size="page"` is a step down in scale AND renders
+// <h1> — reserved for a sub-page that has no other <h1> of its own (e.g.
+// "Play with Mora"), so the document outline has exactly one top-level
+// heading per page instead of every section sitting at the same level.
 export const MoraSectionHeader: React.FC<{
   eyebrow?: string;
   children: React.ReactNode;
   subtitle?: string;
   centered?: boolean;
+  size?: 'lg' | 'page';
   className?: string;
-}> = ({ eyebrow, children, subtitle, centered = false, className = '' }) => (
-  <div className={`${centered ? 'mx-auto max-w-2xl text-center' : 'max-w-xl'} ${className}`}>
-    {eyebrow && (
-      <p className="mb-3 font-hand text-base sm:text-lg font-bold uppercase tracking-wider text-primary">
-        {eyebrow}
-      </p>
-    )}
-    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight text-foreground font-display">
-      {children}
-    </h2>
-    {subtitle && (
-      <p className="mt-4 text-base sm:text-lg text-ink-soft leading-relaxed font-normal">
-        {subtitle}
-      </p>
-    )}
-  </div>
-);
+}> = ({ eyebrow, children, subtitle, centered = false, size = 'lg', className = '' }) => {
+  const HeadingTag = size === 'page' ? 'h1' : 'h2';
+  return (
+    <div className={`${centered ? 'mx-auto max-w-2xl text-center' : 'max-w-xl'} ${className}`}>
+      {eyebrow && (
+        <p
+          className={`mb-3 font-hand font-bold uppercase tracking-wider text-primary ${
+            size === 'page' ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
+          }`}
+        >
+          {eyebrow}
+        </p>
+      )}
+      <HeadingTag
+        className={`font-black leading-tight text-foreground font-display ${
+          size === 'page' ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl lg:text-5xl'
+        }`}
+      >
+        {children}
+      </HeadingTag>
+      {subtitle && (
+        <p className="mt-4 text-base sm:text-lg text-ink-soft leading-relaxed font-normal">
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+};
 
 // Mora Button with exact variants from the reference: joyful, sunshine, outline, ghost, secondary
 export interface MoraButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

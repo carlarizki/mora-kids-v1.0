@@ -1,4 +1,4 @@
-export type RealmId = 'math' | 'science' | 'literacy' | 'creative' | 'logic' | 'quran';
+export type RealmId = 'math' | 'science' | 'literacy' | 'creative' | 'logic' | 'quran' | 'coding';
 
 export type AgeGroupId = 'all' | 'ages-4-6' | 'ages-7-9' | 'ages-10-12';
 
@@ -50,6 +50,28 @@ export interface UserProgress {
   minutesSpent: number;
 }
 
+// Reward Shop — Phase 1 (see mora-reward-shop-prd.md).
+// Track A: cosmetic items, permanently unlocked once bought (no re-purchase).
+export interface CosmeticRewardItem {
+  id: string;
+  name: string;
+  icon: string;
+  costStars: number;
+  category: 'robot-skin' | 'sticker' | 'avatar-frame' | 'theme';
+}
+
+// Track B: parent-defined real-world rewards. Repeatable — redeeming doesn't
+// "own" it, it just logs a redemption Little Moment and deducts stars. The
+// actual reward happens off-app; Mora is only the ledger.
+export interface FamilyReward {
+  id: string;
+  title: string;
+  icon: string;
+  costStars: number;
+  isDefault?: boolean;
+  createdAt: string;
+}
+
 export interface ChildProfile {
   id: string;
   name: string;
@@ -76,6 +98,11 @@ export interface LittleMoment {
   timestamp: string;
   starsEarned?: number;
   category: string;
+  // Optional proof photo (resized data URL) — e.g. from a completed Mission Card.
+  photoUrl?: string;
+  // ISO date string used to group/sort the Portfolio timeline. `timestamp`
+  // above stays a display string (e.g. "Baru saja") — this is the real date.
+  createdAt: string;
 }
 
 export interface SchedulePlan {

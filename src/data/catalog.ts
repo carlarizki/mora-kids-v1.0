@@ -1,8 +1,27 @@
-import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile } from '../types/game';
+import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile, CosmeticRewardItem, FamilyReward } from '../types/game';
 
-export const MORA_HERO_IMAGE = '/src/assets/images/mora-hero.jpg';
-export const MORA_FLOWER_IMAGE = '/src/assets/images/mora-flower.jpg';
-export const MORA_MOMENTS_IMAGE = '/src/assets/images/mora-moments.jpg';
+// NOTE: these used to be raw string paths ('/src/assets/images/mora-hero.jpg') pointing
+// at files that never existed. Even with a correct filename, a plain string path into
+// src/ is never bundled by Vite — only files reached through an ES `import` get hashed
+// into dist/assets and actually ship in production. That's why every photo on the
+// landing page rendered as a broken image / bare alt text.
+//
+// A second pass used generated flat-illustration replacements matching Mora's pastel
+// palette, but the reference build at morakids.lovable.app (the original design target)
+// uses real photography instead. These are the same photos pulled directly from that
+// reference site (matching its original file dimensions exactly), so the landing page
+// now matches the intended design 1:1 instead of approximating it.
+import moraHeroPhoto from '../assets/images/mora-hero-photo.jpg';
+import moraFlowerPhoto from '../assets/images/mora-flower-photo.jpg';
+import moraMomentsPhoto from '../assets/images/mora-moments-photo.jpg';
+import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
+import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
+
+export const MORA_HERO_IMAGE = moraHeroPhoto;
+export const MORA_FLOWER_IMAGE = moraFlowerPhoto;
+export const MORA_MOMENTS_IMAGE = moraMomentsPhoto;
+export const MORA_MASCOT_IMAGE = moraOwlMascot;
+export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
 export const REALMS: Record<RealmId, RealmInfo> = {
   math: {
@@ -19,7 +38,7 @@ export const REALMS: Record<RealmId, RealmInfo> = {
       accent: 'oklch(83% 0.17 83)',
       lightBg: 'bg-sun/15',
     },
-    cardImage: MORA_FLOWER_IMAGE,
+    cardImage: MORA_MATH_KINGDOM_IMAGE,
   },
   science: {
     id: 'science',
@@ -100,6 +119,25 @@ export const REALMS: Record<RealmId, RealmInfo> = {
       lightBg: 'bg-emerald-50',
     },
     cardImage: MORA_MOMENTS_IMAGE,
+  },
+  // Pilot realm (2026-09-29) — see claude/mora-little-coders-pilot-prd.md in the
+  // Mora project for scope/rationale. Age 4-6 only, 1 game, 8 levels, no
+  // loops/conditionals yet (level 8 previews a "repeat" block as a taste-test).
+  coding: {
+    id: 'coding',
+    name: 'Little Coders',
+    shortName: 'Coding',
+    tagline: 'Sequence Moves & Solve Robot Mazes',
+    description: 'Drag-free, icon-only sequencing puzzles that teach step-by-step logic before a single line of code.',
+    icon: 'Code',
+    themeColor: {
+      bg: 'bg-violet',
+      border: 'border-violet/40',
+      text: 'text-violet',
+      accent: 'oklch(62% 0.19 300)',
+      lightBg: 'bg-violet-soft',
+    },
+    cardImage: MORA_FLOWER_IMAGE,
   },
 };
 
@@ -280,6 +318,102 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     isNew: true,
     isPopular: true,
   },
+  // 12. Math Fun Quest
+  {
+    id: 'math-fun-quest',
+    title: 'Math Fun Quest',
+    realm: 'math',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '4 level, 62 jenis soal acak, lengkap dengan cara mengerjakan.',
+    description: 'Kuis matematika seru untuk usia 6-12 tahun. Soal dibangkitkan acak setiap ronde dari Basic Math sampai Master Math, dengan nyawa, bonus streak & kecepatan, lencana, dan penjelasan cara mengerjakan di tiap soal.',
+    skills: ['Hitung Dasar', 'Pecahan & Desimal', 'Aljabar & Pola', 'Soal Cerita', 'Geometri'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#5B4FD6',
+    isNew: true,
+  },
+  // 13. Bhs Inggris
+  {
+    id: 'bhs-inggris-quest',
+    title: 'Bhs Inggris',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '43 mini-game: kosakata, listening & speaking, grammar, susun kalimat.',
+    description: 'Belajar Bahasa Inggris lewat 43 mini-game untuk usia 6-12 tahun, dari tebak warna dan cocokkan kata sampai listening, speaking, dan susun kalimat. Ada level Beginner-Advanced, timer bonus kecepatan, misi harian, lencana, dan Latihan Salahku untuk mengulang soal yang pernah salah.',
+    skills: ['Vocabulary', 'Listening & Speaking', 'Grammar', 'Sentence Practice'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#2EC4B6',
+    isNew: true,
+  },
+  // 14. Petualangan Sains Seru (IPA)
+  {
+    id: 'ipa-sains-seru',
+    title: 'Petualangan Sains Seru',
+    realm: 'science',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Jelajahi IPA lewat modul-modul seru, lengkap misi harian & lencana.',
+    description: 'Game IPA untuk anak SD berisi modul-modul sains yang bisa dijelajahi bebas, dengan level bertingkat, misi harian, lencana pencapaian, dan mode main bareng lewat kode room.',
+    skills: ['Sains Dasar', 'Observasi', 'Logika', 'Eksplorasi Alam'],
+    bannerImage: MORA_HERO_IMAGE,
+    accentColor: '#2BB3AB',
+    isNew: true,
+  },
+  // 15. Petualangan Bahasa Indonesia Ceria
+  {
+    id: 'bahasa-indonesia-ceria',
+    title: 'Bahasa Indonesia',
+    realm: 'literacy',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: '20 mini-game: kosakata, lawan kata, susun kalimat, tanda baca, membaca.',
+    description: 'Belajar Bahasa Indonesia lewat 20 mini-game untuk usia 6-12 tahun, dari tebak huruf dan lawan kata sampai susun kalimat, tanda baca, kata baku, dan membaca-menyimak. Ada 3 level (Pemula-Mahir), 8 kategori fokus, misi harian, dan lencana.',
+    skills: ['Kosakata', 'Tata Bahasa', 'Membaca', 'Menyimak'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#0CA678',
+    isNew: true,
+  },
+  // 16. Petualangan IPS Ceria
+  {
+    id: 'ips-ceria',
+    title: 'IPS Ceria',
+    realm: 'logic',
+    ageGroup: 'all',
+    difficulty: 'medium',
+    durationMinutes: 8,
+    starsReward: 20,
+    tagline: 'Kuis topik, dunia & negara, tebak bendera, sortir, urutkan sejarah.',
+    description: 'Game IPS untuk anak SD: kuis topik, tebak profesi, tebak bendera negara, sortir kebutuhan vs keinginan, dan urutkan peristiwa sejarah. Ada 3 level (Beginner-Advanced), misi harian, papan bintang, dan mode main bareng lewat kode room.',
+    skills: ['Pengetahuan Umum', 'Dunia & Negara', 'Sejarah', 'Logika'],
+    bannerImage: MORA_MOMENTS_IMAGE,
+    accentColor: '#6C4AB6',
+    isNew: true,
+  },
+  // 17. Little Coders — pilot (see claude/mora-little-coders-pilot-prd.md)
+  {
+    id: 'little-coders',
+    title: 'Robo Jalan-Jalan',
+    realm: 'coding',
+    ageGroup: 'ages-4-6',
+    difficulty: 'easy',
+    durationMinutes: 6,
+    starsReward: 20,
+    tagline: 'Susun perintah panah untuk menuntun robot sampai ke tujuan!',
+    description: 'Pilot pengenalan coding tanpa perlu bisa baca: susun perintah Maju, Belok Kiri, dan Belok Kanan sebagai ikon untuk memandu robot melewati 8 puzzle labirin yang makin menantang.',
+    skills: ['Sequencing', 'Spatial Reasoning', 'Problem Solving', 'Computational Thinking'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#8B5CF6',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [
@@ -351,6 +485,7 @@ export const INITIAL_MOMENTS: LittleMoment[] = [
     timestamp: '15 minutes ago',
     starsEarned: 15,
     category: 'Mathematics',
+    createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
   },
   {
     id: 'mom-2',
@@ -361,6 +496,7 @@ export const INITIAL_MOMENTS: LittleMoment[] = [
     timestamp: '1 hour ago',
     starsEarned: 12,
     category: "Qur'an & Hijaiyah",
+    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'mom-3',
@@ -368,10 +504,57 @@ export const INITIAL_MOMENTS: LittleMoment[] = [
     icon: '🎨',
     title: 'Composed on Rainbow Xylophone',
     subtitle: 'Played Twinkle Twinkle Little Star and recorded a sweet tune.',
-    timestamp: '3 hours ago',
+    timestamp: 'Yesterday',
     starsEarned: 10,
     category: 'Creative Studio',
+    createdAt: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString(),
   },
+  {
+    id: 'mom-4',
+    childName: 'Zahra',
+    icon: '📋',
+    title: 'Completed mission: Family Puzzle Time',
+    subtitle: 'Offline activity with Mora',
+    timestamp: '2 days ago',
+    starsEarned: 8,
+    category: 'Mission Card',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'mom-5',
+    childName: 'Aruna',
+    icon: '⚡',
+    title: 'Completed Science Splash Lab',
+    subtitle: 'Finished 6 simple experiments with curiosity to spare!',
+    timestamp: '5 days ago',
+    starsEarned: 14,
+    category: 'Science',
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+// Reward Shop — Track A: cosmetic-only, no gameplay/content unlocks, so it
+// carries zero margin risk. Costs staggered across the star-earning curve
+// (games reward ~10-20 stars each).
+export const REWARD_SHOP_ITEMS: CosmeticRewardItem[] = [
+  { id: 'skin-robot-sunny', name: 'Robot Kuning Cerah', icon: '🤖', costStars: 30, category: 'robot-skin' },
+  { id: 'skin-robot-space', name: 'Robot Angkasa', icon: '🛸', costStars: 60, category: 'robot-skin' },
+  { id: 'skin-robot-royal', name: 'Robot Kerajaan', icon: '👑', costStars: 120, category: 'robot-skin' },
+  { id: 'sticker-star-burst', name: 'Stiker Ledakan Bintang', icon: '✨', costStars: 20, category: 'sticker' },
+  { id: 'sticker-rainbow', name: 'Stiker Pelangi', icon: '🌈', costStars: 35, category: 'sticker' },
+  { id: 'sticker-trophy', name: 'Stiker Piala Juara', icon: '🏆', costStars: 50, category: 'sticker' },
+  { id: 'frame-flower', name: 'Bingkai Bunga', icon: '🌸', costStars: 40, category: 'avatar-frame' },
+  { id: 'frame-gold', name: 'Bingkai Emas', icon: '🎖️', costStars: 90, category: 'avatar-frame' },
+  { id: 'theme-galaxy', name: 'Tema Galaksi', icon: '🌌', costStars: 80, category: 'theme' },
+];
+
+// Track B: default reward templates every family starts with — mitigates the
+// "parent never sets one up" risk. Parents can add their own or delete these.
+export const DEFAULT_FAMILY_REWARDS: FamilyReward[] = [
+  { id: 'reward-default-1', title: 'Nonton film bareng malam ini', icon: '🎬', costStars: 50, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-2', title: 'Screen time tambahan 30 menit', icon: '⏰', costStars: 60, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-3', title: 'Pilih menu makan favorit', icon: '🍕', costStars: 80, isDefault: true, createdAt: new Date().toISOString() },
+  { id: 'reward-default-4', title: 'Jalan-jalan ke taman / playground', icon: '🌳', costStars: 150, isDefault: true, createdAt: new Date().toISOString() },
 ];
 
 export const INITIAL_SCHEDULE: SchedulePlan[] = [

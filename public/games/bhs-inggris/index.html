@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bhs Inggris</title>
+  <meta name="description" content="Bermain sambil belajar Bahasa Inggris untuk anak usia 6-12 tahun." />
+  <meta name="theme-color" content="#2EC4B6" />
+
+  <!-- Embedded inside the Mora app (iframe) — no PWA install/manifest here, Mora is the app shell. -->
+  <style>
+    /* Nama pemain datang dari profil anak di Mora — sembunyikan "Ganti pemain"
+       supaya tidak menyimpang dari profil itu (lihat script "Mora bridge" di bawah). */
+    body.mora-embed #switch-player { display: none; }
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=20260814-1" />
+</head>
+<body>
+
+  <header class="band">
+    <div class="band-inner">
+      <div class="brand-lockup">
+        <img data-brand="logo" alt="" style="display:none" />
+        <div>
+          <h1 data-brand="name">Bhs Inggris</h1>
+          <p data-brand="tagline">Bermain sambil belajar Bahasa Inggris!</p>
+        </div>
+      </div>
+      <div class="band-tools">
+        <span class="star-pill"><span class="star">&#9733;</span><span id="star-count">0</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" aria-live="polite"></main>
+
+  <footer class="band-footer">
+    <span data-brand="footer">English Fun Starter for Kids</span>
+    <span data-brand="credit"> &middot; Belajar sambil bermain!</span>
+  </footer>
+
+  <script>
+    /* Mora bridge — Mora sudah tahu nama anak dari profil keluarga, jadi
+       layar "isi nama" (welcome()) dilewati: nama disimpan duluan di sini,
+       persis seperti yang dilakukan form nama aslinya (localStorage
+       "efq_player"), sebelum js/app.js membaca nilainya saat dimuat. */
+    (function () {
+      try {
+        var name = (new URLSearchParams(location.search).get('name') || '').trim();
+        if (name) {
+          document.body.classList.add('mora-embed');
+          localStorage.setItem('efq_player', name.slice(0, 20));
+        }
+      } catch (e) { /* abaikan */ }
+    })();
+  </script>
+  <script src="js/config.default.js?v=20260814-1"></script>
+  <script src="js/shared.js?v=20260814-1"></script>
+  <script src="js/app.js?v=20260814-1"></script>
+</body>
+</html>

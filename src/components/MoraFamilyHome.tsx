@@ -17,7 +17,10 @@ import {
   ShieldCheck,
   ArrowRight,
   UserPlus,
-  X
+  X,
+  Gift,
+  Lock,
+  Trash2
 } from 'lucide-react';
 import {
   ChildProfile,
@@ -26,10 +29,26 @@ import {
   SchedulePlan,
   VoiceProfile,
   LiveActivity,
-  Language
+  Language,
+  FamilyReward
 } from '../types/game';
 import { MoraButton } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';
+
+// Groups a Portfolio moment into a friendly time bucket based on its real
+// createdAt date (calendar-day diff from "now", not a rolling 24h window).
+const getMomentBucket = (createdAt: string, language: Language): string => {
+  const date = new Date(createdAt);
+  const now = new Date();
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / (24 * 60 * 60 * 1000));
+
+  if (diffDays <= 0) return language === 'id' ? 'Hari ini' : 'Today';
+  if (diffDays === 1) return language === 'id' ? 'Kemarin' : 'Yesterday';
+  if (diffDays <= 7) return language === 'id' ? 'Minggu ini' : 'This week';
+  if (diffDays <= 30) return language === 'id' ? 'Bulan ini' : 'This month';
+  return language === 'id' ? 'Lebih lama' : 'Earlier';
+};
 
 interface MoraFamilyHomeProps {
   childrenList: ChildProfile[];
@@ -43,6 +62,11 @@ interface MoraFamilyHomeProps {
   language: Language;
   onLaunchGame: (gameId: string) => void;
   onSwitchToKidsPlay: () => void;
+  totalStars: number;
+  familyRewards: FamilyReward[];
+  onRedeemFamilyReward: (reward: FamilyReward) => void;
+  onCreateFamilyReward: (title: string, costStars: number, icon: string) => void;
+  onDeleteFamilyReward: (rewardId: string) => void;
 }
 
 export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
@@ -57,13 +81,22 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
   language,
   onLaunchGame,
   onSwitchToKidsPlay,
+  totalStars,
+  familyRewards,
+  onRedeemFamilyReward,
+  onCreateFamilyReward,
+  onDeleteFamilyReward,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'moments' | 'family' | 'voice'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'moments' | 'rewards' | 'family' | 'voice'>('overview');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isAddPlanModalOpen, setIsAddPlanModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'Papa' | 'Mama' | 'Nenek' | 'Kakek' | 'Guardian'>('Papa');
   const [inviteSuccess, setInviteSuccess] = useState(false);
+  const [portfolioChildFilter, setPortfolioChildFilter] = useState<string>('all');
+  const [newRewardTitle, setNewRewardTitle] = useState('');
+  const [newRewardCost, setNewRewardCost] = useState(50);
+  const [newRewardIcon, setNewRewardIcon] = useState('🎁');
 
   // New plan form
   const [planTitle, setPlanTitle] = useState('');
@@ -169,7 +202,8 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
           [
             { id: 'overview' as const, label: language === 'id' ? 'Beranda Keluarga' : 'Family Home' },
             { id: 'schedule' as const, label: language === 'id' ? 'Little Plans (Jadwal)' : 'Little Plans' },
-            { id: 'moments' as const, label: language === 'id' ? "Today's Moments" : "Today's Moments" },
+            { id: 'moments' as const, label: language === 'id' ? 'Portofolio & Momen' : 'Portfolio & Moments' },
+            { id: 'rewards' as const, label: language === 'id' ? 'Reward Keluarga' : 'Family Rewards' },
             { id: 'family' as const, label: language === 'id' ? 'Anggota Keluarga' : 'Family Circle' },
             { id: 'voice' as const, label: language === 'id' ? 'Personalized Voice' : 'Voice Studio' },
           ] as const
@@ -264,7 +298,15 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
                     key={moment.id}
                     className="p-4 rounded-2xl bg-muted/50 border border-border flex items-start gap-3.5"
                   >
-                    <span className="text-2xl mt-0.5">{moment.icon}</span>
+                    {moment.photoUrl ? (
+                      <img
+                        src={moment.photoUrl}
+                        alt={moment.title}
+                        className="size-11 rounded-xl object-cover border border-border shrink-0"
+                      />
+                    ) : (
+                      <span className="text-2xl mt-0.5">{moment.icon}</span>
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-display font-bold text-sm text-foreground">
@@ -460,40 +502,250 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
         </div>
       )}
 
-      {/* MOMENTS TAB */}
-      {activeTab === 'moments' && (
+      {/* PORTFOLIO / MOMENTS TAB */}
+      {activeTab === 'moments' && (() => {
+        const uniqueChildNames = Array.from(new Set(moments.map((m) => m.childName)));
+        const sortedMoments = [...moments].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        const filteredMoments =
+          portfolioChildFilter === 'all'
+            ? sortedMoments
+            : sortedMoments.filter((m) => m.childName === portfolioChildFilter);
+
+        // Group consecutive moments sharing a time bucket (Today / Yesterday /
+        // This week / ...). Sorted desc by createdAt, so buckets come out in
+        // chronological order without needing a separate sort pass.
+        const groups: { bucket: string; items: LittleMoment[] }[] = [];
+        filteredMoments.forEach((m) => {
+          const bucket = getMomentBucket(m.createdAt, language);
+          const last = groups[groups.length - 1];
+          if (last && last.bucket === bucket) {
+            last.items.push(m);
+          } else {
+            groups.push({ bucket, items: [m] });
+          }
+        });
+
+        return (
+          <div className="paper-card rounded-3xl p-6 sm:p-10 border border-border">
+            <div className="mb-6">
+              <h2 className="font-display text-3xl font-black text-foreground">
+                {language === 'id' ? 'Portofolio & Little Moments' : 'Portfolio & Little Moments'}
+              </h2>
+              <p className="text-sm text-ink-soft mt-1">
+                {language === 'id'
+                  ? 'Rekam jejak lengkap: games, worksheet, dan misi offline yang sudah anak selesaikan, tersusun per tanggal.'
+                  : 'A full timeline of games, worksheets, and offline missions your child has completed, grouped by date.'}
+              </p>
+            </div>
+
+            {uniqueChildNames.length > 1 && (
+              <div className="flex flex-wrap items-center gap-2 mb-8">
+                <button
+                  onClick={() => {
+                    sound.playPop();
+                    setPortfolioChildFilter('all');
+                  }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-all ${
+                    portfolioChildFilter === 'all'
+                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      : 'bg-card text-ink-soft hover:bg-muted border border-border'
+                  }`}
+                >
+                  {language === 'id' ? 'Semua Anak' : 'All Children'}
+                </button>
+                {uniqueChildNames.map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      sound.playPop();
+                      setPortfolioChildFilter(name);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-all ${
+                      portfolioChildFilter === name
+                        ? 'bg-primary text-primary-foreground shadow-xs'
+                        : 'bg-card text-ink-soft hover:bg-muted border border-border'
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {groups.length === 0 ? (
+              <div className="p-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-2xl">
+                {language === 'id' ? 'Belum ada momen untuk anak ini.' : 'No moments yet for this child.'}
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {groups.map((group) => (
+                  <div key={`${group.bucket}-${group.items[0].id}`}>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-ink-soft mb-3 font-hand">
+                      {group.bucket}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {group.items.map((m) => (
+                        <div
+                          key={m.id}
+                          className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4"
+                        >
+                          {m.photoUrl ? (
+                            <img
+                              src={m.photoUrl}
+                              alt={m.title}
+                              className="size-14 rounded-2xl object-cover border border-border shrink-0"
+                            />
+                          ) : (
+                            <span className="text-3xl">{m.icon}</span>
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-bold text-primary uppercase font-hand">
+                                {m.category}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground shrink-0">{m.childName}</span>
+                            </div>
+                            <h4 className="font-display text-base font-black text-foreground mt-0.5">{m.title}</h4>
+                            <p className="text-xs text-ink-soft mt-1 leading-relaxed">{m.subtitle}</p>
+                            {m.starsEarned && (
+                              <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-sun-foreground">
+                                <Star className="size-3.5 fill-sun text-sun" />
+                                <span>+{m.starsEarned} Bintang tersimpan</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* FAMILY REWARDS TAB (Track B — parent-set real-world rewards) */}
+      {activeTab === 'rewards' && (
         <div className="paper-card rounded-3xl p-6 sm:p-10 border border-border">
-          <div className="mb-8">
-            <h2 className="font-display text-3xl font-black text-foreground">
-              {language === 'id' ? 'Buku Memori & Little Moments' : 'Family Memory Book & Moments'}
-            </h2>
-            <p className="text-sm text-ink-soft mt-1">
-              {language === 'id'
-                ? 'Kumpulan catatan kecil setiap kali anak menyelesaikan tantangan baru.'
-                : 'A warm memory feed of accomplishments, drawings, and milestones.'}
-            </p>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="font-display text-3xl font-black text-foreground">
+                {language === 'id' ? 'Reward Keluarga' : 'Family Rewards'}
+              </h2>
+              <p className="text-sm text-ink-soft mt-1 max-w-lg">
+                {language === 'id'
+                  ? 'Kamu yang tentukan hadiahnya, Mora yang catat berapa Bintang yang sudah ditukar.'
+                  : "You decide the reward, Mora just tracks how many stars have been redeemed."}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-sun/15 border border-sun/30 shrink-0">
+              <Star className="size-4 fill-sun text-sun" />
+              <span className="font-display text-lg font-black text-foreground tabular-nums">{totalStars}</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {moments.map((m) => (
-              <div key={m.id} className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4">
-                <span className="text-3xl">{m.icon}</span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary uppercase font-hand">{m.category}</span>
-                    <span className="text-[11px] text-muted-foreground">{m.timestamp}</span>
-                  </div>
-                  <h4 className="font-display text-base font-black text-foreground mt-0.5">{m.title}</h4>
-                  <p className="text-xs text-ink-soft mt-1 leading-relaxed">{m.subtitle}</p>
-                  {m.starsEarned && (
-                    <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-sun-foreground">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {familyRewards.map((reward) => {
+              const affordable = totalStars >= reward.costStars;
+              return (
+                <div
+                  key={reward.id}
+                  className="p-5 rounded-2xl bg-card border border-border shadow-soft flex items-start gap-4"
+                >
+                  <span className="text-3xl">{reward.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display text-base font-black text-foreground">{reward.title}</h4>
+                    <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-sun-foreground">
                       <Star className="size-3.5 fill-sun text-sun" />
-                      <span>+{m.starsEarned} Bintang tersimpan</span>
+                      <span>{reward.costStars} Bintang</span>
                     </div>
-                  )}
+                    <div className="mt-3 flex items-center gap-2">
+                      <MoraButton
+                        size="sm"
+                        variant={affordable ? 'joyful' : 'outline'}
+                        disabled={!affordable}
+                        onClick={() => {
+                          if (!affordable) return;
+                          sound.playSuccess();
+                          onRedeemFamilyReward(reward);
+                        }}
+                      >
+                        {affordable ? (
+                          language === 'id' ? 'Tukar Sekarang' : 'Redeem Now'
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <Lock className="size-3" />
+                            {language === 'id' ? 'Kurang Bintang' : 'Not Enough Stars'}
+                          </span>
+                        )}
+                      </MoraButton>
+                      {!reward.isDefault && (
+                        <button
+                          onClick={() => onDeleteFamilyReward(reward.id)}
+                          className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                          aria-label={language === 'id' ? 'Hapus reward' : 'Delete reward'}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          {/* Create a new custom reward */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-secondary border border-primary/10">
+            <h3 className="flex items-center gap-2 font-display text-base font-black text-foreground mb-4">
+              <Gift className="size-4 text-primary" />
+              {language === 'id' ? 'Buat Reward Baru' : 'Create a New Reward'}
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newRewardTitle.trim() || newRewardCost <= 0) return;
+                sound.playSuccess();
+                onCreateFamilyReward(newRewardTitle.trim(), newRewardCost, newRewardIcon);
+                setNewRewardTitle('');
+                setNewRewardCost(50);
+                setNewRewardIcon('🎁');
+              }}
+              className="flex flex-col sm:flex-row gap-3"
+            >
+              <input
+                type="text"
+                maxLength={2}
+                value={newRewardIcon}
+                onChange={(e) => setNewRewardIcon(e.target.value || '🎁')}
+                className="h-11 w-14 shrink-0 rounded-xl bg-card px-3 text-center text-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                aria-label={language === 'id' ? 'Emoji reward' : 'Reward emoji'}
+              />
+              <input
+                type="text"
+                required
+                value={newRewardTitle}
+                onChange={(e) => setNewRewardTitle(e.target.value)}
+                placeholder={language === 'id' ? 'Nama reward, mis. Beli mainan kecil' : 'Reward name, e.g. Buy a small toy'}
+                className="h-11 flex-1 rounded-xl bg-card px-4 text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+              <input
+                type="number"
+                required
+                min={1}
+                value={newRewardCost}
+                onChange={(e) => setNewRewardCost(Number(e.target.value))}
+                className="h-11 w-28 rounded-xl bg-card px-4 text-sm border border-border focus:outline-none focus:ring-2 focus:ring-primary/40"
+                aria-label={language === 'id' ? 'Biaya dalam Bintang' : 'Cost in stars'}
+              />
+              <MoraButton type="submit" variant="joyful" className="h-11 px-6 shrink-0">
+                <Plus className="size-4" />
+                {language === 'id' ? 'Tambah' : 'Add'}
+              </MoraButton>
+            </form>
           </div>
         </div>
       )}
