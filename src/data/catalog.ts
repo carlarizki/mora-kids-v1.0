@@ -448,6 +448,21 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     accentColor: '#E8528F',
     isNew: true,
   },
+  {
+    id: 'singapore-math-lab',
+    title: 'Math Lab ala Singapore',
+    realm: 'math',
+    ageGroup: 'ages-4-6',
+    difficulty: 'easy',
+    durationMinutes: 10,
+    starsReward: 15,
+    tagline: 'Pegang, gambar, lalu tulis angkanya. Satu langkah kecil setiap kali!',
+    description: 'Belajar angka dengan urutan Singapore math: benda, gambar, lalu angka. Coba number bond, make ten, bar model, dan teka-teki berpikir bersama Mama atau Papa.',
+    skills: ['Number Bond', 'Make Ten', 'Bar Model', 'Pola dan Logika'],
+    bannerImage: MORA_MATH_KINGDOM_IMAGE,
+    accentColor: '#16A394',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [

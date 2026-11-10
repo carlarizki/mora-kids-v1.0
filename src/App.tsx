@@ -40,6 +40,7 @@ import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
 import { IpsGame } from './components/games/IpsGame';
 import { LittleCodersGame } from './components/games/LittleCodersGame';
 import { DiscoveryGame } from './components/games/DiscoveryGame';
+import { SingaporeMathLab } from './components/games/SingaporeMathLab';
 
 import {
   GAMES_CATALOG,
@@ -484,6 +485,8 @@ export default function App() {
       }
       case 'discovery-explorer':
         return <DiscoveryGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
+      case 'singapore-math-lab':
+        return <SingaporeMathLab onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
 
       default:
         return null;
