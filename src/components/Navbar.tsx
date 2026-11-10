@@ -13,6 +13,7 @@ interface NavbarProps {
   onOpenRewardShop: () => void;
   onNavigateSection: (sectionId: string) => void;
   onLaunchArabicGame?: () => void;
+  onLaunchMathLab?: () => void;
   currentMode: 'play' | 'family';
   onToggleMode: (mode: 'play' | 'family') => void;
   language: Language;
@@ -32,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenRewardShop,
   onNavigateSection,
   onLaunchArabicGame,
+  onLaunchMathLab,
   currentMode,
   onToggleMode,
   language,
@@ -129,6 +131,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 {language === 'id' ? 'Permainan' : 'Play & Games'}
               </button>
+              {onLaunchMathLab && (
+                <button
+                  onClick={onLaunchMathLab}
+                  className="inline-flex cursor-pointer items-center gap-1.5 transition-colors hover:text-primary"
+                >
+                  Math Lab
+                  <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-black leading-none text-accent-foreground">
+                  {language === 'id' ? 'Baru' : 'New'}
+                </span>
+                </button>
+              )}
               <button
                 onClick={() => handleNavClick('worksheet')}
                 className="cursor-pointer transition-colors hover:text-primary"
@@ -156,6 +169,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 {language === 'id' ? 'Katalog Aktivitas' : 'Activity Library'}
               </button>
+              {onLaunchMathLab && (
+                <button
+                  onClick={onLaunchMathLab}
+                  className="inline-flex cursor-pointer items-center gap-1.5 transition-colors hover:text-primary"
+                >
+                  Math Lab
+                  <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-black leading-none text-accent-foreground">
+                  {language === 'id' ? 'Baru' : 'New'}
+                </span>
+                </button>
+              )}
               <button
                 onClick={() => handleNavClick('pricing')}
                 className="cursor-pointer transition-colors hover:text-primary"
@@ -303,6 +327,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               );
             })}
             <div className="pt-2 border-t border-border flex flex-col gap-2">
+              {isAuthenticated && onLaunchMathLab && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onLaunchMathLab();
+                  }}
+                  className="w-full text-left px-3 py-2.5 text-sm font-bold text-accent-foreground bg-accent hover:bg-accent/70 rounded-xl transition-colors cursor-pointer flex items-center justify-between"
+                >
+                  <span>Math Lab ala Singapore</span>
+                  <span className="text-xs bg-card/70 px-2 py-0.5 rounded-full font-bold">
+                    {language === 'id' ? 'Baru' : 'New'}
+                  </span>
+                </button>
+              )}
               {isAuthenticated && (
                 <button
                   onClick={() => {

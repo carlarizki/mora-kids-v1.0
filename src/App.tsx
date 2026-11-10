@@ -510,6 +510,7 @@ export default function App() {
         onOpenRewardShop={() => setIsRewardShopOpen(true)}
         onNavigateSection={handleNavigateSection}
         onLaunchArabicGame={() => requestPlayGame('arabic-adventure')}
+        onLaunchMathLab={() => requestPlayGame('singapore-math-lab')}
         currentMode={currentMode}
         onToggleMode={(mode) => {
           if (mode === 'family' && !isAuthenticated) {
