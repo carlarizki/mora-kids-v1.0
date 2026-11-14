@@ -1,17 +1,19 @@
 import React from 'react';
 import { Calculator, FlaskConical, BookOpen, Palette, Sparkles, Moon, Code, Compass, ChevronRight } from 'lucide-react';
 import { REALMS } from '../data/catalog';
-import { RealmId } from '../types/game';
+import { Language, RealmId } from '../types/game';
 import { MoraSectionHeader } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';
 
 interface RealmSpotlightProps {
   onSelectRealm: (realm: RealmId) => void;
   selectedRealm: RealmId | 'all';
+  language?: Language;
 }
 
-export const RealmSpotlight: React.FC<RealmSpotlightProps> = ({ onSelectRealm, selectedRealm }) => {
+export const RealmSpotlight: React.FC<RealmSpotlightProps> = ({ onSelectRealm, selectedRealm, language = 'id' }) => {
   const realmsList = Object.values(REALMS);
+  const isId = language === 'id';
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -37,14 +39,19 @@ export const RealmSpotlight: React.FC<RealmSpotlightProps> = ({ onSelectRealm, s
   return (
     <section id="realms-section" className="py-12 max-w-7xl mx-auto px-5 lg:px-8">
       <MoraSectionHeader
-        eyebrow="Curated Realms"
-        subtitle="Six gentle learning environments shaped around natural curiosity."
+        size="md"
+        eyebrow={isId ? 'Dunia Belajar' : 'Curated Realms'}
+        subtitle={
+          isId
+            ? `${realmsList.length} dunia belajar yang lembut, dibentuk dari rasa ingin tahu anak.`
+            : `${realmsList.length} gentle learning environments shaped around natural curiosity.`
+        }
         className="mb-8"
       >
-        Explore by Learning Realm
+        {isId ? 'Jelajahi Dunia Belajar' : 'Explore by Learning Realm'}
       </MoraSectionHeader>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {realmsList.map((realm) => {
           const isSelected = selectedRealm === realm.id;
 

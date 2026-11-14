@@ -251,7 +251,7 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
 
                 <MoraButton
                   size="sm"
-                  variant="sunshine"
+                  variant="joyful"
                   onClick={onSwitchToKidsPlay}
                 >
                   <span>{language === 'id' ? 'Intip Permainan' : 'Join Activity'}</span>
@@ -369,7 +369,7 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
 
                     <MoraButton
                       size="sm"
-                      variant="sunshine"
+                      variant="joyful"
                       onClick={() => onLaunchGame(item.gameId)}
                     >
                       <Play className="size-3 fill-current" />
@@ -480,7 +480,7 @@ export const MoraFamilyHome: React.FC<MoraFamilyHomeProps> = ({
                           <h5 className="font-display font-bold text-sm text-foreground mt-1">{it.title}</h5>
                           <MoraButton
                             size="sm"
-                            variant="sunshine"
+                            variant="joyful"
                             className="mt-3 w-full"
                             onClick={() => onLaunchGame(it.gameId)}
                           >

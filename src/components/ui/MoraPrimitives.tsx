@@ -31,7 +31,7 @@ export const MoraSectionHeader: React.FC<{
   children: React.ReactNode;
   subtitle?: string;
   centered?: boolean;
-  size?: 'lg' | 'page';
+  size?: 'lg' | 'md' | 'page';
   className?: string;
 }> = ({ eyebrow, children, subtitle, centered = false, size = 'lg', className = '' }) => {
   const HeadingTag = size === 'page' ? 'h1' : 'h2';
@@ -40,7 +40,7 @@ export const MoraSectionHeader: React.FC<{
       {eyebrow && (
         <p
           className={`mb-3 font-hand font-bold uppercase tracking-wider text-primary ${
-            size === 'page' ? 'text-sm sm:text-base' : 'text-base sm:text-lg'
+            size === 'lg' ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
           }`}
         >
           {eyebrow}
@@ -48,7 +48,7 @@ export const MoraSectionHeader: React.FC<{
       )}
       <HeadingTag
         className={`font-black leading-tight text-foreground font-display ${
-          size === 'page' ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl lg:text-5xl'
+          size === 'lg' ? 'text-3xl sm:text-4xl lg:text-5xl' : 'text-2xl sm:text-3xl'
         }`}
       >
         {children}

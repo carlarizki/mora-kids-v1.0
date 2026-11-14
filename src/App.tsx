@@ -583,6 +583,7 @@ export default function App() {
           /* Dashboard: logged-in play experience — no marketing fluff, straight to activities */
           <div className="animate-in fade-in duration-200">
             <DailyQuestsBar
+              language={language}
               completedQuestIds={progress.completedQuests}
               onPlayQuest={(realmId) => {
                 if (realmId === 'math') requestPlayGame('math-rocket');
@@ -597,6 +598,7 @@ export default function App() {
             />
 
             <RealmSpotlight
+              language={language}
               selectedRealm={currentRealm}
               onSelectRealm={(r) => {
                 setCurrentRealm(r);
@@ -621,6 +623,7 @@ export default function App() {
             />
 
             <RealmSpotlight
+              language={language}
               selectedRealm={currentRealm}
               onSelectRealm={(r) => {
                 setCurrentRealm(r);

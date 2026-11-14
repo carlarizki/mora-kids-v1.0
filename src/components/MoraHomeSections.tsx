@@ -29,7 +29,7 @@ export const MoraHomeSections: React.FC<MoraHomeSectionsProps> = ({
               Mora gives you age-right activities shaped to your child, so you can play, learn, and grow—one small moment at a time.
             </p>
             <MoraButton
-              variant="sunshine"
+              variant="joyful"
               className="mt-7"
               onClick={() => {
                 sound.playPop();
