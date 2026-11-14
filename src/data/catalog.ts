@@ -448,6 +448,22 @@ export const GAMES_CATALOG: GameCatalogItem[] = [
     accentColor: '#E8528F',
     isNew: true,
   },
+  // 19. Jembatan Angka — number bond, make ten, patterns (CPA-inspired)
+  {
+    id: 'number-bond',
+    title: 'Jembatan Angka',
+    realm: 'math',
+    ageGroup: 'ages-4-6',
+    difficulty: 'easy',
+    durationMinutes: 6,
+    starsReward: 20,
+    tagline: 'Pecah angka, penuhi sepuluh, temukan pola!',
+    description: 'Belajar angka lewat gambar: satu angka bisa dipecah jadi dua bagian, isi kotak sepuluh, dan temukan pola. Tanpa waktu, salah dapat petunjuk.',
+    skills: ['Number Bond', 'Penjumlahan Dasar', 'Pola', 'Berpikir Logis'],
+    bannerImage: MORA_FLOWER_IMAGE,
+    accentColor: '#F5B82E',
+    isNew: true,
+  },
 ];
 
 export const DAILY_QUESTS = [

@@ -27,6 +27,7 @@
 
   --color-sun: oklch(83% 0.17 83);
   --color-sun-foreground: oklch(30% 0.1 266);
+  --color-sun-soft: oklch(95% 0.07 90);
   --color-coral: oklch(70% 0.19 25);
   --color-coral-soft: oklch(94% 0.06 24);
   --color-mint: oklch(68% 0.16 165);

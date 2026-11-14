@@ -40,6 +40,7 @@ import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
 import { IpsGame } from './components/games/IpsGame';
 import { LittleCodersGame } from './components/games/LittleCodersGame';
 import { DiscoveryGame } from './components/games/DiscoveryGame';
+import { NumberBondGame } from './components/games/NumberBondGame';
 
 import {
   GAMES_CATALOG,
@@ -482,6 +483,8 @@ export default function App() {
           <LittleCodersGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} childId={activeChild.id} />
         );
       }
+      case 'number-bond':
+        return <NumberBondGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
       case 'discovery-explorer':
         return <DiscoveryGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
 
