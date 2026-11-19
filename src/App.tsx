@@ -6,15 +6,13 @@
 import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
-import { HeroBanner } from './components/HeroBanner';
 import { DailyQuestsBar } from './components/DailyQuestsBar';
 import { RealmSpotlight } from './components/RealmSpotlight';
-import { MoraHomeSections } from './components/MoraHomeSections';
-import { MoraFooterSections } from './components/MoraFooterSections';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
 import { RewardShopModal } from './components/RewardShopModal';
 import { LoginModal } from './components/LoginModal';
+import { LandingPage } from './components/landing/LandingPage';
 import { isLoggedIn, isPremiumAccount, logout as authLogout } from './utils/auth';
 import { GAME_COMPONENTS, QUEST_BY_GAME, QUEST_GAME_BY_REALM } from './games/registry';
 
@@ -526,41 +524,20 @@ export default function App() {
               />
             </div>
           ) : (
-            /* Public Landing (logged out) — marketing content, matches morakids.lovable.app.
-               Games are browsable here but "play" always routes through the login gate. */
-            <div className="animate-in fade-in duration-200">
-              <HeroBanner
-                onQuickStart={() => requestPlayGame('hijaiyah-quest')}
-                onExploreHowItWorks={() => handleNavigateSection('how-it-works')}
-              />
-
-              <MoraHomeSections
-                onExploreFeatures={() => handleNavigateSection('features')}
-                onExploreGames={() => handleNavigateSection('games')}
-                onStartActivity={() => requestPlayGame('fraction-pizza')}
-              />
-
-              <RealmSpotlight
-                language={language}
-                selectedRealm={currentRealm}
-                onSelectRealm={(r) => {
-                  setCurrentRealm(r);
-                  setActiveGameId(null);
-                  navigateToPlayPage();
-                }}
-              />
-
-              <MoraFooterSections
-                onSelectPlan={() => {
-                  setIsLoginOpen(true);
-                }}
-                onOpenParentCorner={() => setIsLoginOpen(true)}
-                onSelectRealm={(r) => {
-                  setCurrentRealm(r as RealmId);
-                  handleNavigateSection('games');
-                }}
-              />
-            </div>
+            /* Public landing (logged out) — Indonesian-market marketing page.
+               Every "start" CTA routes through the login gate. */
+            <LandingPage
+              onStart={() => setIsLoginOpen(true)}
+              onBrowseRealm={(realm) => {
+                if (realm === 'worksheet') {
+                  handleNavigateSection('worksheet');
+                  return;
+                }
+                setCurrentRealm(realm as RealmId);
+                setActiveGameId(null);
+                navigateToPlayPage();
+              }}
+            />
           )}
         </Suspense>
       </main>

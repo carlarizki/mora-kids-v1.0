@@ -23,6 +23,22 @@ interface NavbarProps {
   onLogout: () => void;
 }
 
+/** Logged-out nav: [label, section id on the landing page]. */
+const LANDING_NAV: [string, string][] = [
+  ['Cara Kerja', 'how-it-works'],
+  ['Materi', 'features'],
+  ['Keluarga', 'for-families'],
+  ['Harga', 'pricing'],
+  ['FAQ', 'faq'],
+];
+
+/** Logged-in mobile nav. */
+const APP_NAV: [string, string][] = [
+  ['Permainan', 'games'],
+  ['Worksheet', 'worksheet'],
+  ['Harga', 'pricing'],
+];
+
 export const Navbar: React.FC<NavbarProps> = ({
   currentRealm,
   onSelectRealm,
@@ -93,32 +109,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Clean Text Navigation Links */}
         <nav className="hidden items-center gap-7 text-sm font-semibold text-ink-soft md:flex" aria-label="Main navigation">
           {!isAuthenticated ? (
-            // Logged-out marketing nav — mirrors morakids.lovable.app: 4 scroll links only.
+            // Logged-out marketing nav — anchors into the Indonesian landing page.
             <>
-              <button
-                onClick={() => handleNavClick('how-it-works')}
-                className="cursor-pointer transition-colors hover:text-primary"
-              >
-                {language === 'id' ? 'Cara Kerja' : 'How it works'}
-              </button>
-              <button
-                onClick={() => handleNavClick('features')}
-                className="cursor-pointer transition-colors hover:text-primary"
-              >
-                {language === 'id' ? 'Fitur' : 'Features'}
-              </button>
-              <button
-                onClick={() => handleNavClick('for-families')}
-                className="cursor-pointer transition-colors hover:text-primary"
-              >
-                {language === 'id' ? 'Keluarga' : 'For families'}
-              </button>
-              <button
-                onClick={() => handleNavClick('stories')}
-                className="cursor-pointer transition-colors hover:text-primary"
-              >
-                {language === 'id' ? 'Cerita' : 'Stories'}
-              </button>
+              {LANDING_NAV.map(([label, id]) => (
+                <button
+                  key={id}
+                  onClick={() => handleNavClick(id)}
+                  className="cursor-pointer transition-colors hover:text-primary"
+                >
+                  {label}
+                </button>
+              ))}
             </>
           ) : currentMode === 'play' ? (
             // Logged-in dashboard nav — actual product destinations, not marketing anchors.
@@ -311,21 +312,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {(isAuthenticated
-              ? ['Play & Games', 'Worksheet', 'Pricing']
-              : ['How it works', 'Features', 'For families', 'Stories']
-            ).map((item) => {
-              const target = item === 'Play & Games' ? 'games' : item.toLowerCase().replaceAll(' ', '-');
-              return (
-                <button
-                  key={item}
-                  onClick={() => handleNavClick(target)}
-                  className="w-full text-left px-3 py-2 text-sm font-bold text-foreground hover:text-primary hover:bg-muted rounded-xl transition-colors cursor-pointer"
-                >
-                  {item}
-                </button>
-              );
-            })}
+            {(isAuthenticated ? APP_NAV : LANDING_NAV).map(([label, target]) => (
+              <button
+                key={target}
+                onClick={() => handleNavClick(target)}
+                className="w-full text-left px-3 py-2 text-sm font-bold text-foreground hover:text-primary hover:bg-muted rounded-xl transition-colors cursor-pointer"
+              >
+                {label}
+              </button>
+            ))}
             <div className="pt-2 border-t border-border flex flex-col gap-2">
               {isAuthenticated && onLaunchMathLab && (
                 <button
