@@ -856,7 +856,6 @@ function footerGear(){
         ? '<a class="linkbtn" href="https://wa.me/'+encodeURIComponent(c.contactWa)+'" target="_blank" rel="noopener">'+
           '<i class="ti ti-brand-whatsapp"></i> '+esc(c.contactLabel||'Hubungi Kami')+'</a>'
         : '')+
-      '<a class="linkbtn" href="admin.html"><i class="ti ti-settings"></i> Panel Admin</a>'+
     '</div>'+
   '</div>';
 }
