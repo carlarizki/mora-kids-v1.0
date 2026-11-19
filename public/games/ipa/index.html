@@ -695,7 +695,7 @@
     <button class="itutup" id="installTutup" aria-label="Tutup">✕</button>
 
     <div class="ppratinjau">
-      <img src="icons/icon-192.png" alt="Ikon aplikasi Sains Seru" />
+      <img src="icons/icon-192.png" alt="Ikon aplikasi Sains Seru" onerror="this.style.visibility='hidden'" />
       <span class="plabel">Sains Seru</span>
     </div>
 
@@ -855,7 +855,7 @@
 
       <div class="footnote" id="footnote"></div>
       <div class="footlinks">
-        <a id="resetLink">Reset progres</a> · <a href="admin.html">Admin</a>
+        <a id="resetLink">Reset progres</a>
       </div>
     </div>
 
@@ -2094,7 +2094,7 @@ function buildMap() {
   var list = mapList();
   if (!list.length) {
     box.innerHTML =
-      '<div class="empty">Belum ada permainan di fokus ini.<br>Buka <b>admin.html</b> untuk menambahkannya.</div>';
+      '<div class="empty">Belum ada permainan di fokus ini.</div>';
     return;
   }
 
@@ -2177,7 +2177,7 @@ function buildGrid() {
   var list = mapList();
   if (!list.length) {
     grid.innerHTML =
-      '<div class="empty">Belum ada permainan di fokus ini.<br>Buka <b>admin.html</b> untuk menambahkannya.</div>';
+      '<div class="empty">Belum ada permainan di fokus ini.</div>';
     return;
   }
 

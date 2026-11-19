@@ -33,6 +33,7 @@ export const GAME_COMPONENTS: Record<string, GameComponent> = {
   'math-rocket': load(() => import('../components/games/MathRocketGame'), 'MathRocketGame'),
   'fraction-pizza': load(() => import('../components/games/PizzaFractionGame'), 'PizzaFractionGame'),
   'number-bond': load(() => import('../components/games/NumberBondGame'), 'NumberBondGame'),
+  'singapore-math-lab': load(() => import('../components/games/SingaporeMathLab'), 'SingaporeMathLab'),
   'math-fun-quest': load(() => import('../components/games/MathFunQuestGame'), 'MathFunQuestGame'),
 
   // Literacy & languages
