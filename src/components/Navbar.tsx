@@ -25,7 +25,7 @@ interface NavbarProps {
 
 /** Logged-out nav: [label, section id on the landing page]. */
 const LANDING_NAV: [string, string][] = [
-  ['Cara Kerja', 'how-it-works'],
+  ['Cara Pakai', 'how-it-works'],
   ['Materi', 'features'],
   ['Keluarga', 'for-families'],
   ['Harga', 'pricing'],

@@ -38,41 +38,41 @@ interface LandingPageProps {
 
 const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
-const TRUST_POINTS = ['Tanpa iklan', 'Bahasa Indonesia', 'Usia 3–8 tahun', '10–15 menit sehari'];
+const TRUST_POINTS = ['Tanpa iklan', 'Pakai Bahasa Indonesia', 'Untuk anak 3–8 tahun', 'Cukup 15 menit sehari'];
 
 const PAINS = [
   {
     icon: Smartphone,
-    title: '“Sebentar lagi, Bun…”',
-    body: 'HP dipegang, video terus berganti. Anak anteng, tapi Ayah & Bunda bertanya-tanya: dia belajar apa?',
+    title: '“Bentar lagi, Bun…”',
+    body: 'Satu video habis, langsung lanjut video berikutnya. Anaknya anteng, tapi kita jadi kepikiran, sebenarnya dia nonton apa?',
   },
   {
     icon: Clock,
-    title: 'Waktu orang tua terbatas',
-    body: 'Pulang kerja sudah capek. Mau menemani belajar, tapi bingung harus mulai dari mana.',
+    title: 'Pulang kerja udah capek',
+    body: 'Pengin nemenin anak belajar, tapi tenaga tinggal sisa. Mau mulai dari mana juga bingung.',
   },
   {
     icon: BookOpen,
-    title: 'Persiapan masuk SD',
-    body: 'Calistung, mengaji, bahasa Inggris — semuanya penting, dan semuanya ingin dimulai dengan cara yang menyenangkan.',
+    title: 'Sebentar lagi masuk SD',
+    body: 'Baca, tulis, hitung, ngaji, bahasa Inggris. Banyak yang mau dikenalkan, tapi anak cepat bosan kalau diajak duduk belajar.',
   },
 ];
 
 const STEPS = [
   {
     n: '1',
-    title: 'Buat profil si kecil',
-    body: 'Masukkan nama dan usianya. Mora menyiapkan aktivitas yang pas untuk tahap belajarnya.',
+    title: 'Buat profil anak',
+    body: 'Isi nama dan umurnya. Mora langsung pilihkan permainan yang pas buat umur segitu.',
   },
   {
     n: '2',
-    title: 'Main 10–15 menit',
-    body: 'Satu sesi singkat setiap hari: game edukatif, misi harian, atau worksheet. Cukup, lalu selesai.',
+    title: 'Main 15 menit',
+    body: 'Satu sesi pendek tiap hari. Bisa main game, kerjakan misi harian, atau isi worksheet. Habis itu udahan, nggak perlu lama-lama.',
   },
   {
     n: '3',
-    title: 'Lanjutkan di dunia nyata',
-    body: 'Kartu misi mengajak anak bermain tanpa layar. Foto momennya, dan seluruh keluarga bisa ikut melihat.',
+    title: 'Lanjut main tanpa layar',
+    body: 'Ada kartu misi buat dimainkan di rumah. Fotoin momennya, nanti keluarga yang lain juga bisa lihat.',
   },
 ];
 
@@ -81,42 +81,42 @@ const REALMS = [
     realm: 'math',
     icon: Calculator,
     title: 'Matematika',
-    body: 'Berhitung, number bond, dan Math Lab ala Singapura: pegang benda, gambar, lalu angka.',
+    body: 'Mulai dari berhitung sampai Math Lab ala Singapura. Anak pakai benda dulu, lalu gambar, baru ke angka.',
     tone: 'bg-sky-soft text-primary',
   },
   {
     realm: 'literacy',
     icon: BookOpen,
     title: 'Calistung & Bahasa',
-    body: 'Mengenal huruf, membaca suku kata, dan kosakata Bahasa Indonesia & Inggris.',
+    body: 'Kenal huruf, belajar baca per suku kata, dan nambah kosakata Bahasa Indonesia dan Inggris.',
     tone: 'bg-coral-soft text-coral',
   },
   {
     realm: 'quran',
     icon: Moon,
     title: 'Hijaiyah & Al-Qur’an',
-    body: 'Mengenal huruf Hijaiyah dan harakat, surat-surat pendek, dan petualangan bahasa Arab.',
+    body: 'Kenalan sama huruf hijaiyah dan harakat, hafalan surat pendek, plus petualangan bahasa Arab.',
     tone: 'bg-mint-soft text-mint',
   },
   {
     realm: 'science',
     icon: FlaskConical,
     title: 'Sains & Sosial',
-    body: 'Rangkaian listrik, ekosistem kolam, dan jelajah dunia lewat tebak-cocok yang seru.',
+    body: 'Bikin rangkaian listrik, kenalan sama hewan di kolam, sampai jalan-jalan keliling dunia.',
     tone: 'bg-sun-soft text-sun-foreground',
   },
   {
     realm: 'coding',
     icon: Code2,
     title: 'Coding Cilik',
-    body: 'Logika langkah demi langkah tanpa mengetik, dirancang untuk anak usia 4–6 tahun.',
+    body: 'Belajar logika langkah demi langkah, nggak perlu bisa ngetik. Cocok buat umur 4–6 tahun.',
     tone: 'bg-violet-soft text-violet',
   },
   {
     realm: 'worksheet',
     icon: Printer,
-    title: 'Worksheet Cetak',
-    body: 'Unduh dan print di rumah, atau kerjakan langsung di layar dengan krayon digital.',
+    title: 'Worksheet',
+    body: 'Bisa di-print lalu dikerjakan pakai krayon, atau langsung dicoret-coret di layar.',
     tone: 'bg-rose-soft text-rose',
   },
 ];
@@ -124,18 +124,18 @@ const REALMS = [
 const FAMILY_FEATURES = [
   {
     icon: Users,
-    title: 'Satu keluarga, satu lingkaran',
-    body: 'Ayah, Bunda, bahkan Eyang di kota lain bisa melihat progres dan momen si kecil.',
+    title: 'Eyang juga bisa ikut lihat',
+    body: 'Undang Ayah, Bunda, atau Eyang yang tinggal di luar kota. Semua bisa lihat perkembangan dan foto kegiatan anak.',
   },
   {
     icon: Mic,
-    title: 'Suara Bunda di dalam game',
-    body: 'Rekam kalimat penyemangat dengan suara sendiri, lalu Mora memutarnya saat anak bermain.',
+    title: 'Ada suara Bunda di dalam game',
+    body: 'Rekam kalimat penyemangat pakai suara sendiri. Nanti Mora putar waktu anak lagi main.',
   },
   {
     icon: Heart,
-    title: 'Hadiah dari bintang',
-    body: 'Bintang yang dikumpulkan bisa ditukar dengan hadiah yang Ayah & Bunda tentukan sendiri.',
+    title: 'Bintang bisa ditukar hadiah',
+    body: 'Hadiahnya Ayah Bunda yang tentukan. Misalnya main ke taman atau es krim di akhir pekan.',
   },
 ];
 
@@ -144,8 +144,8 @@ const PLANS = [
     name: 'Gratis',
     price: 'Rp 0',
     period: 'selamanya',
-    note: 'Untuk mulai mengenal Mora.',
-    items: ['3 sesi main untuk dicoba', '1 profil anak', 'Worksheet gratis'],
+    note: 'Buat kenalan dulu sama Mora.',
+    items: ['Coba main 3 kali', '1 profil anak', 'Worksheet gratis'],
     cta: 'Mulai Gratis',
     highlight: false,
   },
@@ -153,8 +153,8 @@ const PLANS = [
     name: 'Plus',
     price: 'Rp 49.000',
     period: '/bulan',
-    note: 'Paling banyak dipilih keluarga.',
-    items: ['Semua game & Math Lab', 'Sampai 3 profil anak', 'Kartu misi & momen keluarga', 'Tanpa iklan'],
+    note: 'Paling banyak dipilih.',
+    items: ['Semua game, termasuk Math Lab', 'Maksimal 3 profil anak', 'Kartu misi dan album momen', 'Tanpa iklan'],
     cta: 'Coba Plus',
     highlight: true,
   },
@@ -162,8 +162,8 @@ const PLANS = [
     name: 'Keluarga',
     price: 'Rp 79.000',
     period: '/bulan',
-    note: 'Untuk keluarga besar.',
-    items: ['Semua fitur Plus', 'Sampai 5 profil anak', 'Voice Studio suara orang tua', 'Lingkaran keluarga diperluas'],
+    note: 'Buat yang anaknya lebih dari tiga.',
+    items: ['Semua yang ada di Plus', 'Maksimal 5 profil anak', 'Rekam suara orang tua', 'Undang lebih banyak anggota keluarga'],
     cta: 'Pilih Keluarga',
     highlight: false,
   },
@@ -171,28 +171,28 @@ const PLANS = [
 
 const FAQS = [
   {
-    q: 'Untuk usia berapa Mora cocok?',
-    a: 'Mora dirancang untuk anak usia 3–8 tahun, dari PAUD/TK sampai kelas awal SD. Setiap aktivitas punya label usia sehingga Ayah & Bunda bisa memilih yang pas.',
+    q: 'Mora cocok buat umur berapa?',
+    a: 'Buat anak 3–8 tahun, dari PAUD/TK sampai kelas 1–2 SD. Tiap permainan ada keterangan umurnya, jadi gampang milihnya.',
   },
   {
-    q: 'Bukankah anak jadi makin lama di depan layar?',
-    a: 'Justru sebaliknya. Satu sesi Mora hanya 10–15 menit, dan banyak aktivitas berlanjut tanpa layar: worksheet cetak dan kartu misi untuk dimainkan bersama di rumah.',
+    q: 'Nanti anaknya malah makin lama main HP, dong?',
+    a: 'Satu sesi cuma 15 menit. Setelah itu banyak kegiatan yang lanjut tanpa layar, misalnya worksheet yang di-print atau kartu misi yang dimainkan bareng di rumah.',
   },
   {
-    q: 'Apakah aman untuk anak? Ada iklannya?',
-    a: 'Tidak ada iklan dan tidak ada chat dengan orang asing. Fitur pengaturan dan progres berada di area orang tua.',
+    q: 'Aman nggak buat anak? Ada iklannya?',
+    a: 'Nggak ada iklan dan nggak ada fitur chat. Pengaturan dan laporan perkembangan anak cuma bisa dibuka dari bagian orang tua.',
   },
   {
-    q: 'Apakah ada materi mengaji?',
-    a: 'Ada. Mora punya permainan mengenal huruf Hijaiyah dan harakat, surat-surat pendek, serta petualangan bahasa Arab untuk anak.',
+    q: 'Ada materi ngajinya?',
+    a: 'Ada. Anak bisa belajar huruf hijaiyah dan harakat, surat-surat pendek, dan bahasa Arab dasar lewat permainan.',
   },
   {
-    q: 'Bisa dipakai di HP?',
-    a: 'Bisa. Mora berjalan di browser HP, tablet, maupun laptop, tanpa perlu mengunduh aplikasi.',
+    q: 'Bisa dibuka di HP?',
+    a: 'Bisa. Mora langsung jalan di browser HP, tablet, atau laptop. Nggak perlu download aplikasi.',
   },
   {
-    q: 'Bagaimana kalau ingin berhenti berlangganan?',
-    a: 'Paket Gratis bisa dipakai tanpa batas waktu. Paket berbayar bisa dihentikan kapan saja.',
+    q: 'Kalau mau berhenti langganan, gimana?',
+    a: 'Paket Gratis bisa dipakai terus tanpa batas waktu. Paket berbayar bisa dihentikan kapan aja.',
   },
 ];
 
@@ -221,24 +221,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative mx-auto grid max-w-7xl items-center gap-10 overflow-hidden px-5 pb-16 pt-6 sm:pt-8 lg:min-h-[640px] lg:grid-cols-[1fr_1fr] lg:px-8">
         <div className="relative z-10 max-w-2xl">
-          <Eyebrow>Main sambil belajar, bareng Ayah & Bunda ♡</Eyebrow>
+          <Eyebrow>Main bareng, belajar bareng ♡</Eyebrow>
 
           <h1 className="mt-3 font-display text-4xl font-black leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            Waktu layar yang <span className="text-primary">bikin anak tumbuh.</span>
+            Main HP boleh, <span className="text-primary">asal ada belajarnya.</span>
           </h1>
 
           <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
-            Game edukatif, worksheet, dan aktivitas keluarga untuk anak 3–8 tahun. Calistung, Hijaiyah, sampai
-            matematika ala Singapura, cukup 10–15 menit sehari.
+            Mora berisi game edukasi, worksheet, dan kegiatan seru buat anak umur 3–8 tahun. Ada calistung, huruf
+            hijaiyah, sampai matematika ala Singapura. Sehari 15 menit juga udah cukup.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <MoraButton size="lg" variant="joyful" onClick={start}>
-              <span>Coba Gratis Sekarang</span>
+              <span>Coba Gratis</span>
               <ArrowRight className="size-4" />
             </MoraButton>
             <MoraButton size="lg" variant="outline" onClick={() => scrollTo('how-it-works')}>
-              Lihat cara kerjanya
+              Lihat cara pakainya
             </MoraButton>
           </div>
 
@@ -269,7 +269,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
             <span className="flex size-10 items-center justify-center rounded-full bg-sun text-lg">⭐</span>
             <div>
               <p className="text-sm font-black text-foreground">Zahra dapat 3 bintang!</p>
-              <p className="text-xs text-ink-soft">Mengenal huruf Alif–Ba–Ta</p>
+              <p className="text-xs text-ink-soft">Belajar huruf Alif, Ba, Ta</p>
             </div>
           </div>
         </div>
@@ -278,9 +278,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       {/* ── Empathy / problem ─────────────────────────────── */}
       <section className="border-y border-border/60 bg-card py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <MoraSectionHeader eyebrow="Kami paham rasanya" centered>
-            Anak dekat dengan layar itu wajar.
-            <br className="hidden sm:block" /> Yang penting, layarnya mengajak apa.
+          <MoraSectionHeader eyebrow="Pasti pernah ngalamin" centered>
+            Anak susah lepas dari HP? Wajar, kok.
+            <br className="hidden sm:block" /> Yang bisa kita atur itu isinya.
           </MoraSectionHeader>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {PAINS.map(({ icon: Icon, title, body }) => (
@@ -298,7 +298,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       <section id="how-it-works" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 lg:px-8 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <MoraSectionHeader eyebrow="Cara kerjanya">Sebentar di layar, panjang manfaatnya.</MoraSectionHeader>
+            <MoraSectionHeader eyebrow="Cara pakainya">Tiga langkah, nggak ribet.</MoraSectionHeader>
             <ol className="mt-8 space-y-6">
               {STEPS.map((s) => (
                 <li key={s.n} className="flex gap-4">
@@ -329,11 +329,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       <section id="features" className="scroll-mt-20 border-y border-border/60 bg-card py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <MoraSectionHeader
-            eyebrow="Apa yang dipelajari"
+            eyebrow="Isinya apa aja?"
             centered
-            subtitle="Lebih dari 20 game dan aktivitas, disusun per tahap usia, dari yang paling dasar."
+            subtitle="Ada lebih dari 20 permainan, dikelompokkan sesuai umur anak."
           >
-            Semua yang si kecil butuhkan sebelum dan saat masuk SD.
+            Bekal masuk SD, dikemas jadi permainan.
           </MoraSectionHeader>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {REALMS.map(({ realm, icon: Icon, title, body, tone }) => (
@@ -352,7 +352,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
                 <h3 className="mt-4 text-lg font-black text-foreground">{title}</h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{body}</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary">
-                  Lihat aktivitas <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                  Lihat isinya <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </button>
             ))}
@@ -362,8 +362,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
 
       {/* ── Families ──────────────────────────────────────── */}
       <section id="for-families" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 lg:px-8 lg:py-24">
-        <MoraSectionHeader eyebrow="Untuk seluruh keluarga">
-          Belajarnya di aplikasi, <span className="text-primary">kenangannya untuk keluarga.</span>
+        <MoraSectionHeader eyebrow="Buat satu keluarga">
+          Satu rumah bisa ikut <span className="text-primary">lihat perkembangannya.</span>
         </MoraSectionHeader>
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <img
@@ -396,15 +396,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 px-5 sm:flex-row sm:items-center lg:px-8">
           <ShieldCheck className="size-10 shrink-0" />
           <p className="text-lg font-bold leading-snug">
-            Aman sejak awal: tanpa iklan, tanpa chat dengan orang asing, dan semua pengaturan ada di tangan orang tua.
+            Tanpa iklan dan tanpa fitur chat. Semua pengaturan ada di tangan orang tua.
           </p>
         </div>
       </section>
 
       {/* ── Pricing ───────────────────────────────────────── */}
       <section id="pricing" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 lg:px-8 lg:py-24">
-        <MoraSectionHeader eyebrow="Harga" centered subtitle="Mulai gratis. Upgrade kalau si kecil sudah betah.">
-          Lebih hemat dari satu kali les per bulan.
+        <MoraSectionHeader eyebrow="Harga" centered subtitle="Coba gratis dulu. Kalau anaknya suka, baru upgrade.">
+          Lebih murah dari sekali les privat.
         </MoraSectionHeader>
         <div className="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
           {PLANS.map((plan) => (
@@ -452,8 +452,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       {/* ── FAQ ───────────────────────────────────────────── */}
       <section id="faq" className="scroll-mt-20 border-t border-border/60 bg-card py-16 lg:py-24">
         <div className="mx-auto max-w-3xl px-5 lg:px-8">
-          <MoraSectionHeader eyebrow="Pertanyaan yang sering ditanyakan" centered>
-            Ada yang ingin ditanyakan?
+          <MoraSectionHeader eyebrow="FAQ" centered>
+            Yang sering ditanyain Ayah Bunda
           </MoraSectionHeader>
           <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-background">
             {FAQS.map((f, i) => {
@@ -483,15 +483,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
           <div className="blob-soft pointer-events-none absolute -left-10 -top-10 size-40 bg-sun/60" />
           <div className="blob-soft pointer-events-none absolute -bottom-12 -right-8 size-48 bg-mint/50" />
           <div className="relative">
-            <Eyebrow>Hari ini, 15 menit saja</Eyebrow>
+            <Eyebrow>Mulai dari hari ini</Eyebrow>
             <h2 className="mx-auto mt-2 max-w-2xl font-display text-3xl font-black leading-tight text-foreground sm:text-5xl">
-              Mulai kebiasaan belajar yang menyenangkan bersama si kecil.
+              Coba 15 menit hari ini, lihat sendiri reaksi anaknya.
             </h2>
             <MoraButton size="lg" variant="joyful" className="mt-8" onClick={start}>
-              <span>Coba Mora Gratis</span>
+              <span>Coba Gratis</span>
               <ArrowRight className="size-4" />
             </MoraButton>
-            <p className="mt-3 text-sm text-ink-soft">Tanpa kartu kredit. Langsung bisa dipakai di HP.</p>
+            <p className="mt-3 text-sm text-ink-soft">Gratis, tanpa kartu kredit. Bisa langsung dipakai di HP.</p>
           </div>
         </div>
       </section>
@@ -507,7 +507,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-black text-foreground">Coba Mora gratis</p>
-            <p className="truncate text-xs text-ink-soft">Tanpa kartu kredit · 3–8 tahun</p>
+            <p className="truncate text-xs text-ink-soft">Untuk anak 3–8 tahun</p>
           </div>
           <MoraButton variant="joyful" onClick={start} tabIndex={showStickyCta ? 0 : -1}>
             Mulai
@@ -519,12 +519,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       <footer className="border-t border-border/60 pb-20 sm:pb-0">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <p>
-            <span className="font-display text-base font-black text-foreground">mora</span> · Momen kecil, masa depan
-            besar.
+            <span className="font-display text-base font-black text-foreground">mora</span> · Teman main dan belajar
+            anak.
           </p>
           <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Footer">
             {[
-              ['Cara kerja', 'how-it-works'],
+              ['Cara pakai', 'how-it-works'],
               ['Materi', 'features'],
               ['Harga', 'pricing'],
               ['FAQ', 'faq'],
