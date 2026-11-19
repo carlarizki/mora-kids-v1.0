@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, Sparkles, Filter } from 'lucide-react';
+import { Search, X, Sparkles } from 'lucide-react';
 import { GameCatalogItem, RealmId, AgeGroupId } from '../types/game';
 import { GameCard } from './GameCard';
 import { MoraSectionHeader, MoraButton } from './ui/MoraPrimitives';

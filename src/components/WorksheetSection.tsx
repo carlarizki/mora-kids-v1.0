@@ -17,19 +17,27 @@ import {
   ChevronRight,
   Loader2,
 } from 'lucide-react';
-import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-// eslint-disable-next-line import/no-unresolved
-// Unminified build: the minified worker embeds a literal ESC control byte
-// (used to strip malformed text-stream escapes) that some hosting/preview
-// environments refuse to serve as a text asset.
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import { MoraButton, MoraSectionHeader } from './ui/MoraPrimitives';
 import { WORKSHEETS_CATALOG, WorksheetItem } from '../data/worksheets';
 import { Language } from '../types/game';
 import { sound } from '../utils/audio';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+// pdf.js (~400 KB + 2 MB worker) is only needed once a worksheet is opened,
+// so it is loaded on demand instead of shipping in the main bundle.
+// The unminified worker is used on purpose: the minified one embeds a literal
+// ESC byte that some hosting/preview environments refuse to serve as text.
+let pdfjsPromise: Promise<typeof import('pdfjs-dist')> | null = null;
+const loadPdfJs = () => {
+  pdfjsPromise ??= Promise.all([
+    import('pdfjs-dist'),
+    import('pdfjs-dist/build/pdf.worker.mjs?url'),
+  ]).then(([pdfjs, worker]) => {
+    pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
+    return pdfjs;
+  });
+  return pdfjsPromise;
+};
 
 interface WorksheetSectionProps {
   language: Language;
@@ -132,9 +140,9 @@ export const WorksheetSection: React.FC<WorksheetSectionProps> = ({ language }) 
     pdfDocRef.current = null;
     setCurrentPage(1);
 
-    pdfjsLib
-      .getDocument({ url: activeSheet.pdfUrl })
-      .promise.then((pdf) => {
+    loadPdfJs()
+      .then((pdfjs) => pdfjs.getDocument({ url: activeSheet.pdfUrl }).promise)
+      .then((pdf) => {
         if (cancelled) return;
         pdfDocRef.current = pdf;
         setPageCount(pdf.numPages);

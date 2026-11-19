@@ -930,7 +930,6 @@ function renderCollection(){
 const APP_ID='bhs-indo-v5',LS_INST='bic_install_v1';
 let deferredPrompt=null,persisted=null,instBack=null;
 function isInstalled(){try{return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}catch(e){return false;}}
-function offlineReady(){return !!(navigator.serviceWorker&&navigator.serviceWorker.controller);}
 function appLine(cls,icon,name,desc,btn){
   return `<div class="appline ${cls}"><div class="ai">${icon}</div>
     <div class="at"><div class="an">${name}</div><div class="ad">${desc}</div></div>${btn||''}</div>`;
@@ -942,9 +941,6 @@ function renderAppPanel(){
   if(isInstalled())h+=appLine('ok','✅','Sudah dipasang','Aplikasi berjalan dari layar utama.','');
   else if(deferredPrompt)h+=appLine('','📥','Belum dipasang','Pasang untuk dapat ikon di layar utama.','<button class="btn solid sm" onclick="openInstall(true)">Pasang</button>');
   else h+=appLine('','📥','Belum dipasang','Browser ini memasang lewat menunya sendiri — langkahnya ada di panduan.','<button class="btn sm" onclick="openInstall(true)">Cara pasang</button>');
-  h+=offlineReady()
-    ? appLine('ok','✅','Siap dimainkan tanpa internet','Semua soal sudah tersimpan di perangkat ini.','')
-    : appLine('','🌐','Belum siap offline','Buka sekali lewat http/https supaya isinya tersimpan.','');
   h+=persisted===true
     ? appLine('ok','🛡️','Progres terlindungi','Bintang, stiker, dan lencana aman dari pembersihan otomatis.','')
     : appLine('warn','⚠️','Progres belum terlindungi','Browser boleh menghapusnya saat ruang penyimpanan menipis.','<button class="btn solid sm" onclick="doPersist()">Lindungi</button>');
@@ -1439,12 +1435,8 @@ document.addEventListener('pointerdown',e=>{if(e.target.closest('.btn,.selcard,.
   checkPersist();
   /* iOS tidak punya beforeinstallprompt — tawaran untuk pemain lama muncul dari sini. */
   setTimeout(maybeOfferInstall,12000);
-  if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-    navigator.serviceWorker.register('sw.js').then(()=>{
-      /* controller baru muncul setelah SW aktif — segarkan status "siap offline". */
-      navigator.serviceWorker.ready.then(()=>setTimeout(renderAppPanel,300));
-    }).catch(()=>{});
-  }
+  /* Tanpa service worker: di dalam Mora, game ini berjalan sebagai iframe dan
+     Mora-lah app shell-nya, jadi mode offline mandiri tidak dipakai. */
 })();
 </script>
 </body>

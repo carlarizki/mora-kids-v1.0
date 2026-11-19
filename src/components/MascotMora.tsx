@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, MessageCircle, Volume2 } from 'lucide-react';
+import { Sparkles, Volume2 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { MORA_WISDOM_TIPS } from '../data/catalog';
 

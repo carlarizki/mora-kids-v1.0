@@ -4565,9 +4565,6 @@ function buildAppPanel() {
     baris.push({ ico: "⏳", judul: "Sedang menyimpan untuk offline",
                  sub: swStatus.tersimpan + " dari " + swStatus.total +
                       " berkas tersimpan. Tetap tersambung sebentar lagi." });
-  } else if ("serviceWorker" in navigator) {
-    baris.push({ ico: "⏳", judul: "Menyiapkan mode tanpa internet",
-                 sub: "Butuh sekali membuka dengan internet." });
   }
 
   /* --- 4. keamanan progres --- */
@@ -4678,28 +4675,8 @@ function siapkanPWA() {
 
   if (location.protocol === "file:") return;
 
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").then(function (reg) {
-      pantauPembaruan(reg);
-      /* Registrasi selesai belum berarti berkasnya sudah tersimpan; status
-         ditanyakan lagi setelah worker-nya benar-benar siap. */
-      return navigator.serviceWorker.ready;
-    }).then(function () {
-      return segarkanStatusOffline();
-    }).catch(function () {
-      /* Gagal mendaftar bukan alasan untuk merusak permainan — game tetap
-         jalan seperti situs biasa, hanya tanpa kemampuan offline. */
-    });
-
-    /* Versi baru selesai mengambil alih. Halaman hanya dimuat ulang kalau
-       pemain memang menekan "Muat ulang" — bukan saat service worker pertama
-       kali mengambil alih halaman yang baru dibuka. */
-    navigator.serviceWorker.addEventListener("controllerchange", function () {
-      if (!mintaMuatUlang) { segarkanStatusOffline(); return; }
-      mintaMuatUlang = false;
-      location.reload();
-    });
-  }
+  /* Tanpa service worker: di dalam Mora, game ini berjalan sebagai iframe dan
+     Mora-lah app shell-nya, jadi mode offline mandiri tidak dipakai. */
 
   periksaProgresAman().then(buildAppPanel);
 

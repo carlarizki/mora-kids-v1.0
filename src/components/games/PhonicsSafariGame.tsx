@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, RefreshCw, Volume2, Star, Sparkles, Trophy, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Volume2, Star, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../../utils/audio';
 

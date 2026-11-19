@@ -3,44 +3,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
 import { DailyQuestsBar } from './components/DailyQuestsBar';
 import { RealmSpotlight } from './components/RealmSpotlight';
-import { PlayWithMoraPage } from './components/PlayWithMoraPage';
 import { MoraHomeSections } from './components/MoraHomeSections';
 import { MoraFooterSections } from './components/MoraFooterSections';
-import { MoraFamilyHome } from './components/MoraFamilyHome';
 import { MascotMora } from './components/MascotMora';
 import { ParentModal } from './components/ParentModal';
 import { RewardShopModal } from './components/RewardShopModal';
 import { LoginModal } from './components/LoginModal';
-import { PaywallScreen } from './components/PaywallScreen';
 import { isLoggedIn, isPremiumAccount, logout as authLogout } from './utils/auth';
+import { GAME_COMPONENTS, QUEST_BY_GAME, QUEST_GAME_BY_REALM } from './games/registry';
 
-// Existing 8 Games
-import { MathRocketGame } from './components/games/MathRocketGame';
-import { PizzaFractionGame } from './components/games/PizzaFractionGame';
-import { PhonicsSafariGame } from './components/games/PhonicsSafariGame';
-import { ElectricCircuitGame } from './components/games/ElectricCircuitGame';
-import { ScienceEcosystemGame } from './components/games/ScienceEcosystemGame';
-import { RainbowMelodyGame } from './components/games/RainbowMelodyGame';
-import { MemoryMatrixGame } from './components/games/MemoryMatrixGame';
-import { PatternDetectiveGame } from './components/games/PatternDetectiveGame';
-
-// New Quran & Hijaiyah Games
-import { HijaiyahQuestGame } from './components/games/HijaiyahQuestGame';
-import { QuranExplorerGame } from './components/games/QuranExplorerGame';
-import { ArabicAdventureGame } from './components/games/ArabicAdventureGame';
-import { MathFunQuestGame } from './components/games/MathFunQuestGame';
-import { BhsInggrisGame } from './components/games/BhsInggrisGame';
-import { IpaGame } from './components/games/IpaGame';
-import { BahasaIndonesiaGame } from './components/games/BahasaIndonesiaGame';
-import { IpsGame } from './components/games/IpsGame';
-import { LittleCodersGame } from './components/games/LittleCodersGame';
-import { DiscoveryGame } from './components/games/DiscoveryGame';
-import { NumberBondGame } from './components/games/NumberBondGame';
+// Screens that are not part of the first paint are split into their own chunks.
+const PlayWithMoraPage = lazy(() =>
+  import('./components/PlayWithMoraPage').then((m) => ({ default: m.PlayWithMoraPage })),
+);
+const MoraFamilyHome = lazy(() =>
+  import('./components/MoraFamilyHome').then((m) => ({ default: m.MoraFamilyHome })),
+);
+const PaywallScreen = lazy(() =>
+  import('./components/PaywallScreen').then((m) => ({ default: m.PaywallScreen })),
+);
 
 import {
   GAMES_CATALOG,
@@ -69,6 +56,19 @@ import { sound } from './utils/audio';
 import { loadOwnedCosmetics, saveOwnedCosmetics, loadFamilyRewards, saveFamilyRewards } from './utils/rewardShop';
 
 const STORAGE_KEY = 'morakids_progress_v2';
+const MOMENT_ICON_BY_REALM: Partial<Record<RealmId, string>> = {
+  quran: '🕌',
+  math: '⭐',
+  science: '⚡',
+  coding: '🤖',
+  discovery: '🧭',
+};
+
+const ScreenLoader = () => (
+  <div className="flex min-h-[60vh] items-center justify-center text-primary" role="status" aria-label="Loading">
+    <Loader2 className="size-8 animate-spin" />
+  </div>
+);
 const FREE_TRIAL_LIMIT = 3;
 
 // Real (non-dummy) starting point — this build is going out to actual
@@ -114,12 +114,31 @@ export default function App() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Family State
-  const [childrenList, setChildrenList] = useState<ChildProfile[]>(INITIAL_CHILDREN);
+  const [childrenList] = useState<ChildProfile[]>(INITIAL_CHILDREN);
   const [selectedChildId, setSelectedChildId] = useState<string>(INITIAL_CHILDREN[0].id);
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(INITIAL_FAMILY_MEMBERS);
+  const [familyMembers] = useState<FamilyMember[]>(INITIAL_FAMILY_MEMBERS);
   const [moments, setMoments] = useState<LittleMoment[]>(INITIAL_MOMENTS);
-  const [schedule, setSchedule] = useState<SchedulePlan[]>(INITIAL_SCHEDULE);
-  const [voiceProfiles, setVoiceProfiles] = useState<VoiceProfile[]>(INITIAL_VOICE_PROFILES);
+  const [schedule] = useState<SchedulePlan[]>(INITIAL_SCHEDULE);
+  const [voiceProfiles] = useState<VoiceProfile[]>(INITIAL_VOICE_PROFILES);
+
+  const selectedChild = useMemo(
+    () => childrenList.find((c) => c.id === selectedChildId) ?? childrenList[0],
+    [childrenList, selectedChildId],
+  );
+  const t = (id: string, en: string) => (language === 'id' ? id : en);
+
+  // Every reward path (game, mission, shop) logs a Little Moment for the parent.
+  const addMoment = (moment: Omit<LittleMoment, 'childName' | 'timestamp' | 'createdAt'>) => {
+    setMoments((prev) => [
+      {
+        ...moment,
+        childName: selectedChild.name,
+        timestamp: t('Baru saja', 'Just now'),
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  };
 
   // Real-time live activity
   const [liveActivity, setLiveActivity] = useState<LiveActivity>({
@@ -240,7 +259,6 @@ export default function App() {
     setActiveGameId(gameId);
 
     const game = GAMES_CATALOG.find((g) => g.id === gameId);
-    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
 
     // Set realtime live activity state (< 5 sec latency)
     setLiveActivity({
@@ -261,52 +279,33 @@ export default function App() {
   };
 
   const handleFinishGame = (starsEarned: number, score: number) => {
-    const game = GAMES_CATALOG.find((g) => g.id === activeGameId);
-    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
+    const gameId = activeGameId ?? '';
+    const game = GAMES_CATALOG.find((g) => g.id === gameId);
 
-    // Record a new Family Moment
     if (game) {
-      const newMoment: LittleMoment = {
+      addMoment({
         id: `mom-${Date.now()}`,
-        childName: selectedChild.name,
-        icon: game.realm === 'quran' ? '🕌' : game.realm === 'math' ? '⭐' : game.realm === 'science' ? '⚡' : game.realm === 'coding' ? '🤖' : game.realm === 'discovery' ? '🧭' : '🎨',
-        title: language === 'id' ? `Menyelesaikan ${game.title}` : `Completed ${game.title}`,
-        subtitle: language === 'id' ? `Meraih skor ${score} dengan semangat tinggi!` : `Scored ${score} with great joy!`,
-        timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+        icon: MOMENT_ICON_BY_REALM[game.realm] ?? '🎨',
+        title: t(`Menyelesaikan ${game.title}`, `Completed ${game.title}`),
+        subtitle: t(`Meraih skor ${score} dengan semangat tinggi!`, `Scored ${score} with great joy!`),
         starsEarned,
         category: game.title,
-        createdAt: new Date().toISOString(),
-      };
-      setMoments((prev) => [newMoment, ...prev]);
+      });
     }
 
-    // Turn off live activity
     setLiveActivity((prev) => ({ ...prev, isPlaying: false }));
 
     setProgress((prev) => {
-      const newTotalStars = prev.totalStars + starsEarned;
-      const currentHigh = prev.gameHighScores[activeGameId || ''] || 0;
-      const newHighScores = {
-        ...prev.gameHighScores,
-        [activeGameId || '']: Math.max(currentHigh, score),
-      };
-
-      const updatedQuests = [...prev.completedQuests];
-      if (activeGameId === 'math-rocket' && !updatedQuests.includes('quest-1')) {
-        updatedQuests.push('quest-1');
-      }
-      if (activeGameId === 'phonics-safari' && !updatedQuests.includes('quest-2')) {
-        updatedQuests.push('quest-2');
-      }
-      if (activeGameId === 'hijaiyah-quest' && !updatedQuests.includes('quest-3')) {
-        updatedQuests.push('quest-3');
-      }
-
+      const quest = QUEST_BY_GAME[gameId];
       return {
         ...prev,
-        totalStars: newTotalStars,
-        completedQuests: updatedQuests,
-        gameHighScores: newHighScores,
+        totalStars: prev.totalStars + starsEarned,
+        completedQuests:
+          quest && !prev.completedQuests.includes(quest) ? [...prev.completedQuests, quest] : prev.completedQuests,
+        gameHighScores: {
+          ...prev.gameHighScores,
+          [gameId]: Math.max(prev.gameHighScores[gameId] || 0, score),
+        },
       };
     });
   };
@@ -321,49 +320,31 @@ export default function App() {
   // Mission Card completed offline, with a proof photo — awards stars and
   // records a Little Moment, same reward path as finishing a digital game.
   const handleCompleteMission = (mission: MissionCardItem, photoDataUrl: string) => {
-    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-
-    const newMoment: LittleMoment = {
+    addMoment({
       id: `mission-${Date.now()}`,
-      childName: selectedChild.name,
       icon: mission.emoji,
-      title: language === 'id' ? `Selesai misi: ${mission.title}` : `Completed mission: ${mission.title}`,
-      subtitle:
-        language === 'id' ? 'Aktivitas offline bareng Mora' : 'Offline activity with Mora',
-      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      title: t(`Selesai misi: ${mission.title}`, `Completed mission: ${mission.title}`),
+      subtitle: t('Aktivitas offline bareng Mora', 'Offline activity with Mora'),
       starsEarned: mission.starsReward,
       category: 'Mission Card',
       photoUrl: photoDataUrl,
-      createdAt: new Date().toISOString(),
-    };
-    setMoments((prev) => [newMoment, ...prev]);
-
-    setProgress((prev) => ({
-      ...prev,
-      totalStars: prev.totalStars + mission.starsReward,
-    }));
+    });
+    setProgress((prev) => ({ ...prev, totalStars: prev.totalStars + mission.starsReward }));
   };
 
   // Reward Shop — Track A: buy a cosmetic item once with stars. Owned items
   // aren't re-purchasable and don't unlock any gameplay/content.
   const handleRedeemCosmetic = (item: CosmeticRewardItem) => {
     if (progress.totalStars < item.costStars || ownedCosmeticIds.includes(item.id)) return;
-    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-
     setProgress((prev) => ({ ...prev, totalStars: prev.totalStars - item.costStars }));
     setOwnedCosmeticIds((prev) => [...prev, item.id]);
-
-    const newMoment: LittleMoment = {
+    addMoment({
       id: `shop-${Date.now()}`,
-      childName: selectedChild.name,
       icon: item.icon,
-      title: language === 'id' ? `Membeli ${item.name}` : `Bought ${item.name}`,
-      subtitle: language === 'id' ? 'Item dari Toko Bintang' : 'Item from the Star Shop',
-      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      title: t(`Membeli ${item.name}`, `Bought ${item.name}`),
+      subtitle: t('Item dari Toko Bintang', 'Item from the Star Shop'),
       category: 'Toko Bintang',
-      createdAt: new Date().toISOString(),
-    };
-    setMoments((prev) => [newMoment, ...prev]);
+    });
   };
 
   // Reward Shop — Track B: redeem a parent-defined real-world reward.
@@ -371,21 +352,14 @@ export default function App() {
   // deducts stars and logs it to the Portfolio timeline for the parent.
   const handleRedeemFamilyReward = (reward: FamilyReward) => {
     if (progress.totalStars < reward.costStars) return;
-    const selectedChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-
     setProgress((prev) => ({ ...prev, totalStars: prev.totalStars - reward.costStars }));
-
-    const newMoment: LittleMoment = {
+    addMoment({
       id: `familyreward-${Date.now()}`,
-      childName: selectedChild.name,
       icon: reward.icon,
-      title: language === 'id' ? `Menukar: ${reward.title}` : `Redeemed: ${reward.title}`,
-      subtitle: language === 'id' ? 'Hadiah dari orang tua' : 'A reward from the family',
-      timestamp: language === 'id' ? 'Baru saja' : 'Just now',
+      title: t(`Menukar: ${reward.title}`, `Redeemed: ${reward.title}`),
+      subtitle: t('Hadiah dari orang tua', 'A reward from the family'),
       category: 'Reward Keluarga',
-      createdAt: new Date().toISOString(),
-    };
-    setMoments((prev) => [newMoment, ...prev]);
+    });
   };
 
   const handleCreateFamilyReward = (title: string, costStars: number, icon: string) => {
@@ -426,72 +400,7 @@ export default function App() {
     }
   };
 
-  const renderActiveGame = () => {
-    switch (activeGameId) {
-      // Existing 8 Games
-      case 'math-rocket':
-        return <MathRocketGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'fraction-pizza':
-        return <PizzaFractionGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'phonics-safari':
-        return <PhonicsSafariGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'science-circuits':
-        return <ElectricCircuitGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'science-ecosystem':
-        return <ScienceEcosystemGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'rainbow-melody':
-        return <RainbowMelodyGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'memory-matrix':
-        return <MemoryMatrixGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'pattern-detective':
-        return <PatternDetectiveGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-
-      // New Quran & Hijaiyah Games
-      case 'hijaiyah-quest':
-        return <HijaiyahQuestGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'quran-explorer':
-        return <QuranExplorerGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'arabic-adventure':
-        return <ArabicAdventureGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-
-      // Math Fun Quest — standalone static game, embedded as-is (see MathFunQuestGame.tsx)
-      case 'math-fun-quest': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return <MathFunQuestGame onBack={handleBackToCatalog} childName={activeChild.name} />;
-      }
-      case 'bhs-inggris-quest': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return <BhsInggrisGame onBack={handleBackToCatalog} childName={activeChild.name} />;
-      }
-      case 'ipa-sains-seru': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return <IpaGame onBack={handleBackToCatalog} childName={activeChild.name} />;
-      }
-      case 'bahasa-indonesia-ceria': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return <BahasaIndonesiaGame onBack={handleBackToCatalog} childName={activeChild.name} />;
-      }
-      case 'ips-ceria': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return <IpsGame onBack={handleBackToCatalog} childName={activeChild.name} />;
-      }
-
-      // Little Coders — pilot (see claude/mora-little-coders-pilot-prd.md)
-      case 'little-coders': {
-        const activeChild = childrenList.find((c) => c.id === selectedChildId) || childrenList[0];
-        return (
-          <LittleCodersGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} childId={activeChild.id} />
-        );
-      }
-      case 'number-bond':
-        return <NumberBondGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-      case 'discovery-explorer':
-        return <DiscoveryGame onBack={handleBackToCatalog} onFinishGame={handleFinishGame} />;
-
-      default:
-        return null;
-    }
-  };
+  const ActiveGame = activeGameId ? GAME_COMPONENTS[activeGameId] : undefined;
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-sun/30 selection:text-foreground">
@@ -531,119 +440,128 @@ export default function App() {
       />
 
       <main className="flex-1">
-        {activeGameId ? (
-          /* Active Game View (All 10 Games fully playable) */
-          <div className="animate-in fade-in duration-200">
-            {renderActiveGame()}
-          </div>
-        ) : showPaywall ? (
-          <PaywallScreen language={language} onBack={() => setShowPaywall(false)} />
-        ) : showPlayPage ? (
-          /* Play with Mora — the one dedicated page holding every product:
-             games catalog + worksheets. */
-          <PlayWithMoraPage
-            games={GAMES_CATALOG}
-            selectedRealm={currentRealm}
-            onSelectRealm={setCurrentRealm}
-            onPlayGame={requestPlayGame}
-            highScores={progress.gameHighScores}
-            language={language}
-            childId={(childrenList.find((c) => c.id === selectedChildId) || childrenList[0]).id}
-            onCompleteMission={handleCompleteMission}
-            onBack={() => {
-              setShowPlayPage(false);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        ) : currentMode === 'family' && isAuthenticated ? (
-          /* Mora Family Experience (Parents, Schedule, Moments, Voice Studio) — gated */
-          <MoraFamilyHome
-            childrenList={childrenList}
-            selectedChildId={selectedChildId}
-            onSelectChild={setSelectedChildId}
-            members={familyMembers}
-            moments={moments}
-            schedule={schedule}
-            voiceProfiles={voiceProfiles}
-            liveActivity={liveActivity}
-            language={language}
-            onLaunchGame={requestPlayGame}
-            onSwitchToKidsPlay={() => {
-              sound.playPop();
-              setCurrentMode('play');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            totalStars={progress.totalStars}
-            familyRewards={familyRewards}
-            onRedeemFamilyReward={handleRedeemFamilyReward}
-            onCreateFamilyReward={handleCreateFamilyReward}
-            onDeleteFamilyReward={handleDeleteFamilyReward}
-          />
-        ) : isAuthenticated ? (
-          /* Dashboard: logged-in play experience — no marketing fluff, straight to activities */
-          <div className="animate-in fade-in duration-200">
-            <DailyQuestsBar
+        <Suspense fallback={<ScreenLoader />}>
+          {activeGameId ? (
+            /* Active game — each game is its own lazily loaded chunk */
+            <div className="animate-in fade-in duration-200">
+              <Suspense fallback={<ScreenLoader />}>
+                {ActiveGame && (
+                  <ActiveGame
+                    onBack={handleBackToCatalog}
+                    onFinishGame={handleFinishGame}
+                    childId={selectedChild.id}
+                    childName={selectedChild.name}
+                  />
+                )}
+              </Suspense>
+            </div>
+          ) : showPaywall ? (
+            <PaywallScreen language={language} onBack={() => setShowPaywall(false)} />
+          ) : showPlayPage ? (
+            /* Play with Mora — the one dedicated page holding every product:
+               games catalog + worksheets. */
+            <PlayWithMoraPage
+              games={GAMES_CATALOG}
+              selectedRealm={currentRealm}
+              onSelectRealm={setCurrentRealm}
+              onPlayGame={requestPlayGame}
+              highScores={progress.gameHighScores}
               language={language}
-              completedQuestIds={progress.completedQuests}
-              onPlayQuest={(realmId) => {
-                if (realmId === 'math') requestPlayGame('math-rocket');
-                else if (realmId === 'literacy') requestPlayGame('phonics-safari');
-                else if (realmId === 'quran') requestPlayGame('hijaiyah-quest');
-                else if (realmId === 'science') requestPlayGame('science-circuits');
-                else {
-                  setCurrentRealm(realmId as RealmId);
+              childId={selectedChild.id}
+              onCompleteMission={handleCompleteMission}
+              onBack={() => {
+                setShowPlayPage(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          ) : currentMode === 'family' && isAuthenticated ? (
+            /* Mora Family Experience (Parents, Schedule, Moments, Voice Studio) — gated */
+            <MoraFamilyHome
+              childrenList={childrenList}
+              selectedChildId={selectedChildId}
+              onSelectChild={setSelectedChildId}
+              members={familyMembers}
+              moments={moments}
+              schedule={schedule}
+              voiceProfiles={voiceProfiles}
+              liveActivity={liveActivity}
+              language={language}
+              onLaunchGame={requestPlayGame}
+              onSwitchToKidsPlay={() => {
+                sound.playPop();
+                setCurrentMode('play');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              totalStars={progress.totalStars}
+              familyRewards={familyRewards}
+              onRedeemFamilyReward={handleRedeemFamilyReward}
+              onCreateFamilyReward={handleCreateFamilyReward}
+              onDeleteFamilyReward={handleDeleteFamilyReward}
+            />
+          ) : isAuthenticated ? (
+            /* Dashboard: logged-in play experience — no marketing fluff, straight to activities */
+            <div className="animate-in fade-in duration-200">
+              <DailyQuestsBar
+                language={language}
+                completedQuestIds={progress.completedQuests}
+                onPlayQuest={(realmId) => {
+                  const questGame = QUEST_GAME_BY_REALM[realmId];
+                  if (questGame) requestPlayGame(questGame);
+                  else {
+                    setCurrentRealm(realmId as RealmId);
+                    navigateToPlayPage();
+                  }
+                }}
+              />
+
+              <RealmSpotlight
+                language={language}
+                selectedRealm={currentRealm}
+                onSelectRealm={(r) => {
+                  setCurrentRealm(r);
+                  setActiveGameId(null);
                   navigateToPlayPage();
-                }
-              }}
-            />
+                }}
+              />
+            </div>
+          ) : (
+            /* Public Landing (logged out) — marketing content, matches morakids.lovable.app.
+               Games are browsable here but "play" always routes through the login gate. */
+            <div className="animate-in fade-in duration-200">
+              <HeroBanner
+                onQuickStart={() => requestPlayGame('hijaiyah-quest')}
+                onExploreHowItWorks={() => handleNavigateSection('how-it-works')}
+              />
 
-            <RealmSpotlight
-              language={language}
-              selectedRealm={currentRealm}
-              onSelectRealm={(r) => {
-                setCurrentRealm(r);
-                setActiveGameId(null);
-                navigateToPlayPage();
-              }}
-            />
-          </div>
-        ) : (
-          /* Public Landing (logged out) — marketing content, matches morakids.lovable.app.
-             Games are browsable here but "play" always routes through the login gate. */
-          <div className="animate-in fade-in duration-200">
-            <HeroBanner
-              onQuickStart={() => requestPlayGame('hijaiyah-quest')}
-              onExploreHowItWorks={() => handleNavigateSection('how-it-works')}
-            />
+              <MoraHomeSections
+                onExploreFeatures={() => handleNavigateSection('features')}
+                onExploreGames={() => handleNavigateSection('games')}
+                onStartActivity={() => requestPlayGame('fraction-pizza')}
+              />
 
-            <MoraHomeSections
-              onExploreFeatures={() => handleNavigateSection('features')}
-              onExploreGames={() => handleNavigateSection('games')}
-              onStartActivity={() => requestPlayGame('fraction-pizza')}
-            />
+              <RealmSpotlight
+                language={language}
+                selectedRealm={currentRealm}
+                onSelectRealm={(r) => {
+                  setCurrentRealm(r);
+                  setActiveGameId(null);
+                  navigateToPlayPage();
+                }}
+              />
 
-            <RealmSpotlight
-              language={language}
-              selectedRealm={currentRealm}
-              onSelectRealm={(r) => {
-                setCurrentRealm(r);
-                setActiveGameId(null);
-                navigateToPlayPage();
-              }}
-            />
-
-            <MoraFooterSections
-              onSelectPlan={() => {
-                setIsLoginOpen(true);
-              }}
-              onOpenParentCorner={() => setIsLoginOpen(true)}
-              onSelectRealm={(r) => {
-                setCurrentRealm(r as any);
-                handleNavigateSection('games');
-              }}
-            />
-          </div>
-        )}
+              <MoraFooterSections
+                onSelectPlan={() => {
+                  setIsLoginOpen(true);
+                }}
+                onOpenParentCorner={() => setIsLoginOpen(true)}
+                onSelectRealm={(r) => {
+                  setCurrentRealm(r as RealmId);
+                  handleNavigateSection('games');
+                }}
+              />
+            </div>
+          )}
+        </Suspense>
       </main>
 
       {/* Interactive Mascot widget */}

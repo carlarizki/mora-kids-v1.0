@@ -1,26 +1,16 @@
 import { GameCatalogItem, RealmId, RealmInfo, ChildProfile, FamilyMember, LittleMoment, SchedulePlan, VoiceProfile, CosmeticRewardItem, FamilyReward } from '../types/game';
 
-// NOTE: these used to be raw string paths ('/src/assets/images/mora-hero.jpg') pointing
-// at files that never existed. Even with a correct filename, a plain string path into
-// src/ is never bundled by Vite — only files reached through an ES `import` get hashed
-// into dist/assets and actually ship in production. That's why every photo on the
-// landing page rendered as a broken image / bare alt text.
-//
-// A second pass used generated flat-illustration replacements matching Mora's pastel
-// palette, but the reference build at morakids.lovable.app (the original design target)
-// uses real photography instead. These are the same photos pulled directly from that
-// reference site (matching its original file dimensions exactly), so the landing page
-// now matches the intended design 1:1 instead of approximating it.
-import moraHeroPhoto from '../assets/images/mora-hero-photo.jpg';
-import moraFlowerPhoto from '../assets/images/mora-flower-photo.jpg';
-import moraMomentsPhoto from '../assets/images/mora-moments-photo.jpg';
-import moraOwlMascot from '../assets/images/morakids_hero_mascot_1790447137530.jpg';
-import moraMathKingdom from '../assets/images/realm_math_kingdom_1790447153048.jpg';
+// Photos are imported (not string paths) so Vite hashes and bundles them.
+// Source photography matches the reference design; files are WebP, resized to
+// their largest rendered size to keep the landing page light.
+import moraHeroPhoto from '../assets/images/mora-hero.webp';
+import moraFlowerPhoto from '../assets/images/mora-flower.webp';
+import moraMomentsPhoto from '../assets/images/mora-moments.webp';
+import moraMathKingdom from '../assets/images/realm-math-kingdom.webp';
 
 export const MORA_HERO_IMAGE = moraHeroPhoto;
 export const MORA_FLOWER_IMAGE = moraFlowerPhoto;
 export const MORA_MOMENTS_IMAGE = moraMomentsPhoto;
-export const MORA_MASCOT_IMAGE = moraOwlMascot;
 export const MORA_MATH_KINGDOM_IMAGE = moraMathKingdom;
 
 export const REALMS: Record<RealmId, RealmInfo> = {
