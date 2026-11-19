@@ -543,7 +543,8 @@ export default function App() {
       </main>
 
       {/* Interactive Mascot widget */}
-      <MascotMora />
+      {/* On phones the logged-out landing has its own sticky CTA, so the mascot steps aside. */}
+      <MascotMora hideOnMobile={!isAuthenticated} />
 
       {/* Grown-ups / Teacher Progress modal — logged-in only */}
       {isAuthenticated && (

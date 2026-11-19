@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -202,6 +202,14 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  // Phones: once the hero CTA scrolls away, keep a slim "Coba Gratis" bar at the bottom.
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowStickyCta(window.scrollY > 520);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const start = () => {
     sound.playPop();
@@ -211,7 +219,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
   return (
     <div className="animate-in fade-in duration-200">
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative mx-auto grid max-w-7xl items-center gap-10 overflow-hidden px-5 pb-16 pt-8 lg:min-h-[640px] lg:grid-cols-[1fr_1fr] lg:px-8">
+      <section className="relative mx-auto grid max-w-7xl items-center gap-10 overflow-hidden px-5 pb-16 pt-6 sm:pt-8 lg:min-h-[640px] lg:grid-cols-[1fr_1fr] lg:px-8">
         <div className="relative z-10 max-w-2xl">
           <Eyebrow>Main sambil belajar, bareng Ayah & Bunda ♡</Eyebrow>
 
@@ -224,7 +232,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
             matematika ala Singapura, cukup 10–15 menit sehari.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <MoraButton size="lg" variant="joyful" onClick={start}>
               <span>Coba Gratis Sekarang</span>
               <ArrowRight className="size-4" />
@@ -489,7 +497,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseRealm
       </section>
 
       {/* ── Footer ────────────────────────────────────────── */}
-      <footer className="border-t border-border/60">
+      {/* ── Sticky CTA (phones only) ──────────────────────── */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur transition-transform duration-200 motion-reduce:transition-none sm:hidden ${
+          showStickyCta ? 'translate-y-0' : 'translate-y-full'
+        }`}
+        aria-hidden={!showStickyCta}
+      >
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black text-foreground">Coba Mora gratis</p>
+            <p className="truncate text-xs text-ink-soft">Tanpa kartu kredit · 3–8 tahun</p>
+          </div>
+          <MoraButton variant="joyful" onClick={start} tabIndex={showStickyCta ? 0 : -1}>
+            Mulai
+            <ArrowRight className="size-4" />
+          </MoraButton>
+        </div>
+      </div>
+
+      <footer className="border-t border-border/60 pb-20 sm:pb-0">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <p>
             <span className="font-display text-base font-black text-foreground">mora</span> · Momen kecil, masa depan

@@ -257,20 +257,29 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile menu hamburger */}
         <div className="flex items-center gap-2 md:hidden">
-          <button
-            onClick={onToggleLanguage}
-            className="text-xs font-bold px-2 py-1 bg-muted rounded-full text-foreground"
-          >
-            {language === 'id' ? 'ID' : 'EN'}
-          </button>
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={onToggleLanguage}
+                className="text-xs font-bold px-2 py-1 bg-muted rounded-full text-foreground"
+              >
+                {language === 'id' ? 'ID' : 'EN'}
+              </button>
 
-          <button
-            type="button"
-            onClick={onToggleSound}
-            className="flex size-9 items-center justify-center rounded-full text-ink-soft"
-          >
-            {soundMuted ? <VolumeX className="size-4 text-muted-foreground" /> : <Volume2 className="size-4 text-primary" />}
-          </button>
+              <button
+                type="button"
+                onClick={onToggleSound}
+                className="flex size-9 items-center justify-center rounded-full text-ink-soft"
+              >
+                {soundMuted ? <VolumeX className="size-4 text-muted-foreground" /> : <Volume2 className="size-4 text-primary" />}
+              </button>
+            </>
+          ) : (
+            <MoraButton variant="joyful" size="sm" onClick={onLoginClick}>
+              <span>{language === 'id' ? 'Mulai' : 'Get started'}</span>
+              <ArrowRight className="size-3.5" />
+            </MoraButton>
+          )}
 
           <button
             type="button"

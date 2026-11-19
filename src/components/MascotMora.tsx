@@ -3,7 +3,7 @@ import { Sparkles, Volume2 } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { MORA_WISDOM_TIPS } from '../data/catalog';
 
-export const MascotMora: React.FC = () => {
+export const MascotMora: React.FC<{ hideOnMobile?: boolean }> = ({ hideOnMobile = false }) => {
   const [tipIndex, setTipIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,7 +18,7 @@ export const MascotMora: React.FC = () => {
   const currentTip = MORA_WISDOM_TIPS[tipIndex];
 
   return (
-    <div className={`fixed bottom-4 right-0 z-40 flex flex-col items-end pr-4 transition-transform duration-200 motion-reduce:transition-none hover:translate-x-0 focus-within:translate-x-0 ${isOpen ? 'translate-x-0' : 'translate-x-9'}`}>
+    <div className={`${hideOnMobile ? 'max-sm:hidden ' : ''}fixed bottom-4 right-0 z-40 flex flex-col items-end pr-4 transition-transform duration-200 motion-reduce:transition-none hover:translate-x-0 focus-within:translate-x-0 ${isOpen ? 'translate-x-0' : 'translate-x-9'}`}>
       {isOpen && (
         <div className="mb-3 max-w-xs sm:max-w-sm p-4 bg-white rounded-2xl shadow-xl border-2 border-amber-300 text-slate-800 text-sm relative animate-in fade-in slide-in-from-bottom-2">
           <div className="flex items-center justify-between gap-2 mb-1.5">
