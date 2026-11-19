@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { Sparkles, ArrowLeft, Check } from 'lucide-react';
-import { MoraButton } from './ui/MoraPrimitives';
 import { Language } from '../types/game';
 
 interface PaywallScreenProps {

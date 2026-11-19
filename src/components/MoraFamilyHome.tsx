@@ -3,24 +3,19 @@ import { VoiceLineRecorder } from './VoiceLineRecorder';
 import { VOICE_LINES } from '../utils/voiceRecorder';
 import {
   Users,
-  Calendar,
   Sparkles,
   Mic,
-  Clock,
   Plus,
   Play,
   CheckCircle,
-  Heart,
   Volume2,
-  Share2,
   Star,
-  ShieldCheck,
   ArrowRight,
   UserPlus,
   X,
   Gift,
   Lock,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 import {
   ChildProfile,

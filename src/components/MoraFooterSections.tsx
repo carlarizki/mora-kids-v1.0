@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MoraLogo, MoraSectionHeader, MoraButton, MoraSunBob } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';
 

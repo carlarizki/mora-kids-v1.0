@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Volume2, Star, Bookmark, BookOpen, Check, Trophy, Heart } from 'lucide-react';
+import { ArrowLeft, Volume2, Bookmark, BookOpen, Check, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { KEMENAG_SHORT_SURAHS, QuranSurah, QuranAyah } from '../../data/catalog';
+import { KEMENAG_SHORT_SURAHS, QuranAyah } from '../../data/catalog';
 import { sound } from '../../utils/audio';
 
 interface QuranExplorerGameProps {

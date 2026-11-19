@@ -3,21 +3,11 @@ import {
   ArrowLeft,
   RefreshCw,
   Star,
-  Trophy,
   Volume2,
-  Users,
-  Compass,
-  Sparkles,
-  Shield,
-  Heart,
-  Clock,
-  CheckCircle2,
   Lock,
   ChevronRight,
   Flame,
-  Award,
-  Layers,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../../utils/audio';
@@ -67,7 +57,7 @@ export const ArabicAdventureGame: React.FC<ArabicAdventureGameProps> = ({
     kata: 1,
   });
   const [totalStars, setTotalStars] = useState<number>(35);
-  const [streakDays, setStreakDays] = useState<number>(3);
+  const streakDays = 3;
   const [unlockAllGates, setUnlockAllGates] = useState<boolean>(true); // default friendly for exploring
 
   // In-Game state

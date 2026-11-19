@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Clock, RotateCcw, Check } from 'lucide-react';
+import { X, ShieldCheck, Clock, RotateCcw } from 'lucide-react';
 import { UserProgress } from '../types/game';
 import { MoraButton } from './ui/MoraPrimitives';
 import { sound } from '../utils/audio';

@@ -85,6 +85,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onQuickStart, onExploreH
           alt="A smiling child enjoying colorful finger painting"
           width={1200}
           height={1008}
+          fetchPriority="high"
+          decoding="async"
           className="blob-soft animate-float relative z-10 h-full min-h-[430px] w-full object-cover object-center shadow-soft lg:min-h-[610px]"
         />
 

@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowUp, CornerUpLeft, CornerUpRight, ChevronsUp, Play, Rota
 import confetti from 'canvas-confetti';
 import { MoraButton } from '../ui/MoraPrimitives';
 import { sound } from '../../utils/audio';
-import { CODING_LEVELS, CodingLevel, CommandType, Direction, GridPos } from '../../data/codingLevels';
+import { CODING_LEVELS, CodingLevel, CommandType, Direction } from '../../data/codingLevels';
 import { loadCodingProgress, saveCodingProgress } from '../../utils/codingProgress';
 
 interface LittleCodersGameProps {
